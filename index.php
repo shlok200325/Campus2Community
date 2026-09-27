@@ -1,6 +1,26 @@
 <?php
 require_once __DIR__ . '/db.php';
 $user = $_SESSION['c2c_user'] ?? null;
+
+$dbComplaints = [];
+$pdo = getDbConnection();
+if ($pdo) {
+    if ($user && ($user['role'] ?? '') === 'user' && !empty($user['mobile'])) {
+        $cleanMobile = preg_replace('/[^0-9]/', '', $user['mobile']);
+        $stmt = $pdo->prepare("SELECT * FROM `complaints` WHERE `citizen_mobile` = ? ORDER BY `id` DESC LIMIT 6");
+        $stmt->execute([$cleanMobile]);
+        $userComplaints = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $stmt = $pdo->prepare("SELECT * FROM `complaints` WHERE `citizen_mobile` != ? ORDER BY `id` DESC LIMIT 6");
+        $stmt->execute([$cleanMobile]);
+        $otherComplaints = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $dbComplaints = array_merge($userComplaints, $otherComplaints);
+    } else {
+        $stmt = $pdo->query("SELECT * FROM `complaints` ORDER BY `id` DESC LIMIT 8");
+        $dbComplaints = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+}
 ?>
 <!DOCTYPE html>
 
@@ -1005,155 +1025,282 @@ Engineered an electricity-free micro-irrigation system utilizing hillside natura
 <h2 class="font-headline-xl text-headline-xl text-primary font-bold mt-1">Track Problem Status</h2>
 <p class="font-body-md text-body-md text-on-surface-variant">Check real-time progress across all 9 verification, university adoption, and field completion stages.</p>
 </div>
-<!-- Tracking Search Box -->
+<!-- 1. Active Grievances Live From Database Selector -->
+<div class="mb-8">
+  <div class="flex items-center justify-between mb-3">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-secondary text-[22px]">database</span>
+      <h3 class="font-headline-sm text-headline-sm text-primary font-bold">Active Grievances in Database • डेटाबेस में दर्ज समस्याएं</h3>
+    </div>
+    <span class="text-xs text-on-surface-variant font-medium">Click any problem to inspect its live status</span>
+  </div>
+
+  <?php if (!empty($dbComplaints)): ?>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <?php foreach ($dbComplaints as $c): 
+      $isAssigned = ($c['status'] === 'University Assigned' || !empty($c['assigned_university_name']));
+      $isUserComplaint = ($user && !empty($user['mobile']) && $c['citizen_mobile'] === $user['mobile']);
+    ?>
+    <div class="bg-surface-container-lowest border-2 <?php echo $isUserComplaint ? 'border-secondary ring-2 ring-secondary/20' : 'border-outline-variant'; ?> rounded-xl p-4 shadow-xs hover:border-primary transition-all flex flex-col justify-between group cursor-pointer" onclick="selectDbComplaint('<?php echo htmlspecialchars($c['ticket_id']); ?>')">
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[11px] font-mono font-bold text-primary bg-primary-fixed px-2 py-0.5 rounded"><?php echo htmlspecialchars($c['ticket_id']); ?></span>
+          <?php if ($isUserComplaint): ?>
+            <span class="text-[10px] font-bold text-secondary bg-secondary-container px-2 py-0.5 rounded-full uppercase">Your Complaint</span>
+          <?php else: ?>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-outline"><?php echo htmlspecialchars($c['category']); ?></span>
+          <?php endif; ?>
+        </div>
+        <h4 class="font-bold text-primary text-xs line-clamp-2 group-hover:text-secondary transition leading-snug">
+          <?php echo htmlspecialchars($c['problem_title']); ?>
+        </h4>
+        <p class="text-[11px] text-on-surface-variant mt-1.5 flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px] text-outline">location_on</span>
+          <span class="truncate"><?php echo htmlspecialchars($c['locality'] ?? $c['district']); ?>, <?php echo htmlspecialchars($c['district']); ?></span>
+        </p>
+      </div>
+
+      <div class="mt-3 pt-2.5 border-t border-outline-variant/60 flex items-center justify-between">
+        <span class="text-[10px] font-bold <?php echo $isAssigned ? 'text-secondary font-semibold' : 'text-primary'; ?>">
+          <?php echo $isAssigned ? '● Stage 5: Uni Assigned' : '● Stage 4: Enrolled'; ?>
+        </span>
+        <span class="text-[11px] font-bold text-secondary group-hover:underline flex items-center gap-0.5">
+          Track <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+        </span>
+      </div>
+    </div>
+    <?php endforeach; ?>
+  </div>
+  <?php else: ?>
+  <div class="p-4 bg-surface-container-low rounded-xl text-xs text-on-surface-variant text-center">
+    No grievances currently loaded from database. Submit your first complaint above to begin tracking.
+  </div>
+  <?php endif; ?>
+</div>
+
+<!-- 2. Tracking Search Box -->
 <div class="bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-6 shadow-sm mb-8">
-<form class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end" onsubmit="handleTrackSearch(event)">
-<div class="md:col-span-5">
-<label class="block font-label-md text-label-md text-primary font-bold mb-1" for="track-id">
-              Problem ID / शिकायत क्रमांक:
-            </label>
-<input class="w-full h-[50px] bg-surface-container-lowest border-2 border-outline rounded-lg px-4 text-body-md text-primary font-mono font-bold focus:border-primary focus:ring-1 focus:ring-primary" id="track-id" type="text" value="JC2C-2026-00125"/>
+  <form class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end" onsubmit="handleTrackSearch(event)">
+    <div class="md:col-span-5">
+      <label class="block font-label-md text-label-md text-primary font-bold mb-1" for="track-id">
+        Problem ID / शिकायत क्रमांक:
+      </label>
+      <input class="w-full h-[50px] bg-surface-container-lowest border-2 border-outline rounded-lg px-4 text-body-md text-primary font-mono font-bold focus:border-primary focus:ring-1 focus:ring-primary uppercase" id="track-id" placeholder="e.g. JC2C-2026-00125" type="text" value="JC2C-2026-00125"/>
+    </div>
+    <div class="md:col-span-4">
+      <label class="block font-label-md text-label-md text-primary font-bold mb-1" for="track-mobile">
+        Registered Mobile / पंजीकृत मोबाइल:
+      </label>
+      <input class="w-full h-[50px] bg-surface-container-lowest border-2 border-outline rounded-lg px-4 text-body-md text-primary font-mono focus:border-primary focus:ring-1 focus:ring-primary" id="track-mobile" placeholder="e.g. 9876543210" type="tel" value="<?php echo htmlspecialchars($user['mobile'] ?? ''); ?>"/>
+    </div>
+    <div class="md:col-span-3">
+      <button class="w-full h-[50px] flex items-center justify-center gap-2 bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg font-bold rounded-lg shadow-sm transition active:scale-[0.99]" id="track-search-btn" type="submit">
+        <span class="material-symbols-outlined text-[20px]" id="track-search-icon">search</span>
+        <span id="track-search-text">Fetch Live Status</span>
+      </button>
+    </div>
+  </form>
+
+  <!-- Quick Demo Search Shortcuts -->
+  <div class="mt-4 pt-3 border-t border-outline-variant/60 flex flex-wrap items-center gap-2 text-xs">
+    <span class="text-outline font-bold uppercase tracking-wider text-[11px]">Quick Samples:</span>
+    <button class="bg-surface-container hover:bg-surface-container-high text-primary px-2.5 py-1 rounded text-xs font-mono font-semibold transition" onclick="selectDbComplaint('JC2C-2026-00125')" type="button">
+      JC2C-2026-00125 (BIT Mesra Assigned)
+    </button>
+    <button class="bg-surface-container hover:bg-surface-container-high text-primary px-2.5 py-1 rounded text-xs font-mono font-semibold transition" onclick="selectDbComplaint('JC2C-2026-00089')" type="button">
+      JC2C-2026-00089 (Dhanbad Crater)
+    </button>
+    <button class="bg-surface-container hover:bg-surface-container-high text-primary px-2.5 py-1 rounded text-xs font-mono font-semibold transition" onclick="selectDbComplaint('JC2C-2026-00042')" type="button">
+      JC2C-2026-00042 (Ghatsila Chromium)
+    </button>
+    <button class="bg-surface-container hover:bg-surface-container-high text-primary px-2.5 py-1 rounded text-xs font-mono font-semibold transition" onclick="selectDbComplaint('JC2C-2026-00389')" type="button">
+      JC2C-2026-00389 (Angara Block)
+    </button>
+  </div>
+
+  <!-- Multi-match drawer if searched by mobile -->
+  <div class="hidden mt-4 pt-4 border-t border-secondary/30 bg-secondary/5 -mx-6 -mb-6 p-4 rounded-b-xl" id="matching-complaints-box">
+    <span class="text-xs font-bold text-secondary uppercase tracking-wider block mb-2" id="matching-complaints-title">Multiple Complaints Registered Under Your Mobile:</span>
+    <div class="flex flex-wrap gap-2" id="matching-complaints-list"></div>
+  </div>
 </div>
-<div class="md:col-span-4">
-<label class="block font-label-md text-label-md text-primary font-bold mb-1" for="track-mobile">
-              Registered Mobile / पंजीकृत मोबाइल:
-            </label>
-<input class="w-full h-[50px] bg-surface-container-lowest border-2 border-outline rounded-lg px-4 text-body-md text-primary font-mono focus:border-primary focus:ring-1 focus:ring-primary" id="track-mobile" type="tel" value="9876543210"/>
+
+<!-- 3. Tracking Error State Container (Hidden by default) -->
+<div class="hidden bg-error-container border-2 border-error text-on-error-container rounded-xl p-6 mb-8 text-center" id="track-error-container">
+  <span class="material-symbols-outlined text-[36px] text-error mb-2">error</span>
+  <h3 class="font-bold text-base text-error" id="track-error-title">No Grievance Record Found</h3>
+  <p class="text-xs text-on-error-container mt-1 max-w-lg mx-auto" id="track-error-msg">
+    Please verify your Problem ID or registered mobile number. You can also pick from the active database grievances above.
+  </p>
 </div>
-<div class="md:col-span-3">
-<button class="w-full h-[50px] flex items-center justify-center gap-2 bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg font-bold rounded-lg shadow-sm transition active:scale-[0.99]" type="submit">
-<span class="material-symbols-outlined text-[20px]">search</span>
-<span>Fetch Live Status</span>
-</button>
-</div>
-</form>
-</div>
-<!-- Problem Metadata Snapshot Card -->
-<div class="bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-6 shadow-sm mb-10">
-<div class="flex flex-wrap items-center justify-between gap-4 border-b border-outline-variant pb-4 mb-6">
-<div>
-<div class="flex items-center gap-2">
-<span class="text-xs font-mono font-bold text-outline" id="track-disp-id">ID: JC2C-2026-00125</span>
-<span class="bg-surface-container px-2.5 py-0.5 rounded text-xs font-bold text-primary" id="track-disp-cat">Water &amp; Supply</span>
-<!-- Status Badge highlighting Stage 5 -->
-<span class="bg-secondary-container text-on-secondary-container px-3 py-0.5 rounded-full text-xs font-bold border border-secondary" id="track-disp-status">
-                ● Current: Stage 5 - University Selected
-              </span>
-</div>
-<h3 class="font-headline-md text-headline-md text-primary font-bold mt-1.5" id="track-disp-title">
-              Broken Submersible Pump &amp; Contaminated Groundwater in Chutia Ward 14
-            </h3>
-<span class="text-xs text-on-surface-variant" id="track-disp-citizen">Reported by Rajeshwar Oraon • District: Ranchi • Filed on 14 Jan 2026</span>
-</div>
-<div class="text-right">
-<span class="text-xs text-outline block">Assigned Technical Institute</span>
-<span class="text-sm font-bold text-secondary block" id="track-disp-uni">Birla Institute of Technology (BIT), Mesra</span>
-<span class="text-[11px] text-on-surface-variant" id="track-disp-dept">Dept of Civil &amp; Environmental Engineering</span>
-</div>
-</div>
-<!-- 9-Stage Stepper Component -->
-<div class="py-4">
-<h4 class="font-label-lg text-label-lg text-primary font-bold mb-6 flex items-center gap-2">
-<span class="material-symbols-outlined text-secondary">alt_route</span>
-<span>9-Stage Verified Governance &amp; University Resolution Pipeline</span>
-</h4>
-<div class="relative">
-<!-- Responsive Timeline layout -->
-<div class="grid grid-cols-1 md:grid-cols-9 gap-4 relative">
-<!-- Stage 1: Reported -->
-<div class="flex flex-col items-center text-center group">
-<div class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-bold text-xs mb-2 shadow-sm ring-4 ring-secondary/20">
-<span class="material-symbols-outlined text-[20px]">check</span>
-</div>
-<span class="font-bold text-xs text-primary">1. Reported</span>
-<span class="text-[11px] text-secondary font-semibold">Done (Jan 14)</span>
-</div>
-<!-- Stage 2: Verification -->
-<div class="flex flex-col items-center text-center group">
-<div class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-bold text-xs mb-2 shadow-sm ring-4 ring-secondary/20">
-<span class="material-symbols-outlined text-[20px]">check</span>
-</div>
-<span class="font-bold text-xs text-primary">2. Verification</span>
-<span class="text-[11px] text-secondary font-semibold">Verified (Jan 15)</span>
-</div>
-<!-- Stage 3: Admin Scrutiny -->
-<div class="flex flex-col items-center text-center group">
-<div class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-bold text-xs mb-2 shadow-sm ring-4 ring-secondary/20">
-<span class="material-symbols-outlined text-[20px]">check</span>
-</div>
-<span class="font-bold text-xs text-primary">3. Scrutiny</span>
-<span class="text-[11px] text-secondary font-semibold">Approved (Jan 16)</span>
-</div>
-<!-- Stage 4: University Enrollment -->
-<div class="flex flex-col items-center text-center group">
-<div class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-bold text-xs mb-2 shadow-sm ring-4 ring-secondary/20">
-<span class="material-symbols-outlined text-[20px]">check</span>
-</div>
-<span class="font-bold text-xs text-primary">4. Uni Enrolled</span>
-<span class="text-[11px] text-secondary font-semibold">3 Proposals (Jan 18)</span>
-</div>
-<!-- Stage 5: University Selected (ACTIVE CURRENT STAGE) -->
-<div class="flex flex-col items-center text-center group">
-<div class="w-12 h-12 -mt-1 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-sm mb-2 shadow-md ring-4 ring-secondary animate-pulse">
-<span class="material-symbols-outlined text-[24px]">school</span>
-</div>
-<span class="font-bold text-xs text-secondary font-bold">5. Selected</span>
-<span class="text-[11px] font-bold text-primary bg-secondary-fixed/40 px-1.5 py-0.5 rounded">BIT Mesra</span>
-</div>
-<!-- Stage 6: Solution Development (UPCOMING) -->
-<div class="flex flex-col items-center text-center opacity-60">
-<div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold text-xs mb-2 border border-outline">
-                  6
-                </div>
-<span class="font-bold text-xs text-on-surface">6. Solution Dev</span>
-<span class="text-[11px] text-outline">Lab Testing</span>
-</div>
-<!-- Stage 7: Field Testing -->
-<div class="flex flex-col items-center text-center opacity-60">
-<div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold text-xs mb-2 border border-outline">
-                  7
-                </div>
-<span class="font-bold text-xs text-on-surface">7. Field Testing</span>
-<span class="text-[11px] text-outline">Site Inspection</span>
-</div>
-<!-- Stage 8: Implementation -->
-<div class="flex flex-col items-center text-center opacity-60">
-<div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold text-xs mb-2 border border-outline">
-                  8
-                </div>
-<span class="font-bold text-xs text-on-surface">8. Execution</span>
-<span class="text-[11px] text-outline">Civil Works</span>
-</div>
-<!-- Stage 9: Solved -->
-<div class="flex flex-col items-center text-center opacity-60">
-<div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold text-xs mb-2 border border-outline">
-                  9
-                </div>
-<span class="font-bold text-xs text-on-surface">9. Solved</span>
-<span class="text-[11px] text-outline">Final Sign-off</span>
-</div>
-</div>
-</div>
-</div>
-<!-- Recent Audit Log for Problem -->
-<div class="mt-8 border-t border-outline-variant pt-6">
-<h4 class="font-label-md text-label-md text-primary font-bold mb-3">Live Administrative Activity Log:</h4>
-<div class="space-y-2 text-xs">
-<div class="p-3 bg-surface-container-low rounded border border-outline-variant flex items-center justify-between">
-<div>
-<span class="font-bold text-primary">Stage 5 Completed: </span>
-<span class="text-on-surface-variant">BIT Mesra Civil Dept Team (Led by Dr. S. K. Verma) officially selected by State Scrutiny Committee for solution deployment.</span>
-</div>
-<span class="text-outline font-mono">Yesterday, 16:40 IST</span>
-</div>
-<div class="p-3 bg-surface-container-low rounded border border-outline-variant flex items-center justify-between">
-<div>
-<span class="font-bold text-primary">Stage 4 Notice: </span>
-<span class="text-on-surface-variant">NIT Jamshedpur &amp; BIT Mesra submitted competing technical blueprints for high-salinity filtration.</span>
-</div>
-<span class="text-outline font-mono">18 Jan 2026, 11:20 IST</span>
-</div>
-</div>
+
+<!-- 4. Problem Live Details Container -->
+<div id="track-result-container">
+  <!-- Problem Metadata Snapshot Card -->
+  <div class="bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-6 shadow-sm mb-8">
+    <div class="flex flex-wrap items-center justify-between gap-4 border-b border-outline-variant pb-4 mb-6">
+      <div>
+        <div class="flex flex-wrap items-center gap-2 mb-1.5">
+          <span class="text-xs font-mono font-bold text-primary bg-primary-fixed px-2.5 py-0.5 rounded" id="track-disp-id">ID: JC2C-2026-00125</span>
+          <span class="bg-surface-container px-2.5 py-0.5 rounded text-xs font-bold text-primary" id="track-disp-cat">Water &amp; Supply</span>
+          <span class="bg-error/10 text-error px-2.5 py-0.5 rounded text-xs font-bold" id="track-disp-urgency">High Priority</span>
+          <span class="bg-secondary-container text-on-secondary-container px-3 py-0.5 rounded-full text-xs font-bold border border-secondary" id="track-disp-status">
+            ● Current: Stage 5 - University Selected
+          </span>
+        </div>
+        <h3 class="font-headline-md text-headline-md text-primary font-bold mt-1" id="track-disp-title">
+          Broken Submersible Pump &amp; Contaminated Groundwater in Chutia Ward 14
+        </h3>
+        <p class="text-xs text-on-surface-variant mt-1.5" id="track-disp-citizen">
+          Reported by Rajeshwar Oraon • District: Ranchi • Filed on 14 Jan 2026
+        </p>
+      </div>
+      <div class="text-right bg-surface-container-low p-3 rounded-lg border border-outline-variant min-w-[240px]">
+        <span class="text-[11px] text-outline uppercase font-bold block">Assigned Technical Institute</span>
+        <span class="text-sm font-bold text-secondary block mt-0.5" id="track-disp-uni">Birla Institute of Technology (BIT), Mesra</span>
+        <span class="text-xs text-primary font-semibold block mt-0.5" id="track-disp-grant">Grant Sanctioned: ₹85,000</span>
+        <span class="text-[11px] text-on-surface-variant block" id="track-disp-timeline">Timeline: 14 Days (Rapid Implementation)</span>
+      </div>
+    </div>
+
+    <!-- Problem Description & Live Geotag Snapshot -->
+    <div class="bg-surface-container-low rounded-lg p-4 border border-outline-variant/70 mb-6">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <span class="text-[11px] font-bold text-outline uppercase tracking-wider block mb-1">Grievance Description / समस्या विवरण:</span>
+          <p class="text-xs text-on-surface leading-relaxed" id="track-disp-desc">
+            The community tube-well pump motor burned out 3 weeks ago. Over 180 tribal families are fetching water from a muddy ditch 1.2 km away. Urgent electrical repair and water filtration required.
+          </p>
+        </div>
+      </div>
+      <div class="mt-3 pt-3 border-t border-outline-variant/50 flex flex-wrap items-center justify-between text-xs text-on-surface-variant">
+        <span class="flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px] text-secondary">pin_drop</span>
+          <span class="font-bold text-primary">GPS Geotag:</span>
+          <span id="track-disp-geotag">Ward 14, Chutia Near Block Office, Ranchi, Jharkhand (GPS: 23.3441° N, 85.3096° E)</span>
+        </span>
+        <span class="text-outline font-mono text-[11px]" id="track-disp-dates">Created: 26 Sep 2026</span>
+      </div>
+    </div>
+
+    <!-- 9-Stage Stepper Component -->
+    <div class="py-2">
+      <div class="flex items-center justify-between mb-4">
+        <h4 class="font-label-lg text-label-lg text-primary font-bold flex items-center gap-2">
+          <span class="material-symbols-outlined text-secondary">alt_route</span>
+          <span>9-Stage Verified Governance &amp; University Resolution Pipeline</span>
+        </h4>
+        <span class="text-xs font-bold text-secondary bg-secondary-container px-2.5 py-0.5 rounded-full" id="track-stepper-stage-badge">
+          Stage 5 Active
+        </span>
+      </div>
+
+      <!-- Dynamic Stepper Grid (Populated by JavaScript) -->
+      <div class="relative mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-9 gap-3 relative" id="track-stepper-grid">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </div>
+
+      <!-- Stepper Current Stage Milestone Explanation Banner -->
+      <div class="p-3.5 bg-secondary/10 border border-secondary/30 rounded-lg flex items-center justify-between text-xs" id="track-milestone-banner">
+        <div class="flex items-center gap-2.5">
+          <span class="material-symbols-outlined text-secondary text-[22px]">info</span>
+          <div>
+            <span class="font-bold text-primary" id="track-milestone-title">Current Milestone: Stage 5 - University Selected</span>
+            <p class="text-on-surface-variant mt-0.5" id="track-milestone-desc">
+              Birla Institute of Technology (BIT), Mesra has been sanctioned ₹85,000 to fabricate prototype and conduct water filtration.
+            </p>
+          </div>
+        </div>
+        <span class="text-[11px] font-bold text-secondary uppercase tracking-wider whitespace-nowrap bg-surface-container-lowest px-2.5 py-1 rounded shadow-xs border border-secondary/30">
+          Live Sync • Verified
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Two-Column Problem Insights: Photo & Geotag Mini-Map VS University Proposals -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
+    <!-- Left Column: Photo Evidence & GPS Mini Map (5 Cols) -->
+    <div class="lg:col-span-5 space-y-6">
+      <!-- Evidence Photo Card -->
+      <div class="bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <h4 class="font-bold text-primary text-sm flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-secondary text-[18px]">photo_camera</span>
+            <span>Citizen Photo Evidence (प्रमाण)</span>
+          </h4>
+          <span class="text-[10px] font-bold uppercase bg-surface-container text-outline px-2 py-0.5 rounded">Geotagged</span>
+        </div>
+        <div class="relative rounded-lg overflow-hidden border border-outline-variant group bg-surface-container">
+          <img alt="Complaint Evidence" class="w-full h-48 object-cover group-hover:scale-105 transition duration-300" id="track-disp-photo" src="https://images.unsplash.com/photo-1541888946425-d0fbb186c5f7?auto=format&fit=crop&w=800&q=80"/>
+          <div class="absolute bottom-0 inset-x-0 bg-primary/80 backdrop-blur-xs text-on-primary p-2 text-[11px] flex justify-between items-center">
+            <span class="truncate" id="track-disp-photo-caption">Ground photographic evidence</span>
+            <a class="text-secondary hover:underline font-bold whitespace-nowrap" href="#" id="track-disp-photo-link" target="_blank">View Full</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live GPS Geotag Pinpoint Mini-Map -->
+      <div class="bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <h4 class="font-bold text-primary text-sm flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-secondary text-[18px]">location_searching</span>
+            <span>Pinpoint Geo-Coordinates Map</span>
+          </h4>
+          <span class="text-[11px] font-mono text-outline" id="track-disp-coords">23.3441° N, 85.3096° E</span>
+        </div>
+        <div class="h-44 w-full rounded-lg overflow-hidden border border-outline-variant z-10" id="track-mini-map"></div>
+        <p class="text-[11px] text-on-surface-variant mt-2 leading-relaxed" id="track-disp-map-note">
+          Geofenced location verified under Jharkhand Urban Local Body GIS registry.
+        </p>
+      </div>
+    </div>
+
+    <!-- Right Column: University Solutions & Proposals (7 Cols) -->
+    <div class="lg:col-span-7 space-y-6">
+      <div class="bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-outline-variant">
+          <div>
+            <h4 class="font-bold text-primary text-base flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-secondary text-[20px]">school</span>
+              <span>Enrolled University Engineering Proposals</span>
+            </h4>
+            <p class="text-xs text-on-surface-variant mt-0.5">Competitive academic blueprints submitted under Jharkhand Capstone Protocol.</p>
+          </div>
+          <span class="text-xs font-bold text-primary bg-primary-fixed px-2.5 py-0.5 rounded-full" id="track-proposals-count">
+            3 Proposals
+          </span>
+        </div>
+
+        <!-- Proposals List Container -->
+        <div class="space-y-3" id="track-proposals-list">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </div>
+
+      <!-- Administrative Activity Audit Log -->
+      <div class="bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-outline-variant">
+          <div>
+            <h4 class="font-bold text-primary text-base flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-secondary text-[20px]">receipt_long</span>
+              <span>Live Administrative Activity Log</span>
+            </h4>
+            <p class="text-xs text-on-surface-variant mt-0.5">Chronological record of state scrutiny, university bids, and fund allocation.</p>
+          </div>
+          <span class="text-[11px] font-bold text-secondary uppercase tracking-wider flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-secondary animate-ping"></span> Live Audit
+          </span>
+        </div>
+
+        <div class="space-y-2.5 text-xs" id="track-activity-log-container">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 </div>
 </div>
@@ -2309,54 +2456,354 @@ Under the Jharkhand State Civic Redressal guidelines, grievances can only be reg
       fetchTrackComplaint(ticketId);
     }
 
-    // Handle Live Track Search connecting to PHP MySQL API
-    function handleTrackSearch(event) {
-      event.preventDefault();
-      const searchVal = document.getElementById('track-id').value.trim();
-      if (!searchVal) return;
-      fetchTrackComplaint(searchVal);
-    }
+    // Global Track Mini-Map instance
+    let trackMiniMap = null;
+    let trackMarker = null;
 
-    async function fetchTrackComplaint(ticketId) {
-      try {
-        const res = await fetch(`api/complaints.php?action=track&ticket_id=${encodeURIComponent(ticketId)}`);
-        const data = await res.json();
-
-        if (data.success && data.complaint) {
-          const c = data.complaint;
-          document.getElementById('track-disp-id').textContent = 'ID: ' + c.ticket_id;
-          document.getElementById('track-disp-cat').textContent = c.category;
-          document.getElementById('track-disp-title').textContent = c.problem_title;
-          document.getElementById('track-disp-citizen').textContent = `Reported by ${c.citizen_name} • District: ${c.district} • GPS: ${c.latitude}° N, ${c.longitude}° E`;
-
-          const statusEl = document.getElementById('track-disp-status');
-          const uniEl = document.getElementById('track-disp-uni');
-          const deptEl = document.getElementById('track-disp-dept');
-
-          if (c.status === 'University Assigned' || c.assigned_university_name) {
-            statusEl.textContent = "● Current: Stage 5 - University Selected";
-            statusEl.className = "bg-secondary-container text-on-secondary-container px-3 py-0.5 rounded-full text-xs font-bold border border-secondary";
-            uniEl.textContent = c.assigned_university_name;
-            deptEl.textContent = `Sanctioned Grant: ₹${Number(c.sanctioned_grant).toLocaleString()} • ${c.milestone_timeline || '14 Days'}`;
-          } else {
-            statusEl.textContent = "● Current: Stage 4 - Universities Enrolled (Under Scrutiny)";
-            statusEl.className = "bg-tertiary/10 text-tertiary px-3 py-0.5 rounded-full text-xs font-bold border border-tertiary/30";
-            uniEl.textContent = "Awaiting Admin Allocation";
-            deptEl.textContent = `${data.proposals ? data.proposals.length : 0} College Bids Registered in Database`;
-          }
-        } else {
-          alert(data.message || `No grievance found for '${ticketId}'.`);
-        }
-      } catch (err) {
-        console.error(err);
-        alert(`Could not fetch tracking data for '${ticketId}'.`);
+    // Quick selection of database complaint card or shortcut pill
+    function selectDbComplaint(ticketId) {
+      if (!ticketId) return;
+      switchMainTab('track-view');
+      const trackInput = document.getElementById('track-id');
+      if (trackInput) trackInput.value = ticketId;
+      fetchTrackComplaint(ticketId, '');
+      const resultBox = document.getElementById('track-result-container');
+      if (resultBox) {
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
 
+    // Handle Live Track Search
+    function handleTrackSearch(event) {
+      if (event) event.preventDefault();
+      const ticketId = (document.getElementById('track-id')?.value || '').trim();
+      const mobile = (document.getElementById('track-mobile')?.value || '').trim();
+
+      if (!ticketId && !mobile) {
+        alert('Please enter a Problem ID (e.g. JC2C-2026-00125) or 10-digit registered mobile number.');
+        return;
+      }
+      fetchTrackComplaint(ticketId, mobile);
+    }
+
+    // Fetch complaint and dynamic lifecycle from MySQL API
+    async function fetchTrackComplaint(ticketId, mobile = '') {
+      const btn = document.getElementById('track-search-btn');
+      const btnText = document.getElementById('track-search-text');
+      const btnIcon = document.getElementById('track-search-icon');
+      const errBox = document.getElementById('track-error-container');
+      const resBox = document.getElementById('track-result-container');
+
+      if (btn) btn.disabled = true;
+      if (btnText) btnText.textContent = "Fetching...";
+      if (btnIcon) btnIcon.textContent = "sync";
+
+      try {
+        let url = 'api/complaints.php?action=track';
+        if (ticketId) url += `&ticket_id=${encodeURIComponent(ticketId)}`;
+        if (mobile) url += `&mobile=${encodeURIComponent(mobile)}`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.textContent = "Fetch Live Status";
+        if (btnIcon) btnIcon.textContent = "search";
+
+        if (!data.success || !data.complaint) {
+          if (errBox) {
+            errBox.classList.remove('hidden');
+            const errMsg = document.getElementById('track-error-msg');
+            if (errMsg) errMsg.textContent = data.message || `No grievance record found for search query.`;
+          }
+          if (resBox) resBox.classList.add('hidden');
+          return;
+        }
+
+        // Hide error, display result
+        if (errBox) errBox.classList.add('hidden');
+        if (resBox) resBox.classList.remove('hidden');
+
+        const c = data.complaint;
+        const proposals = data.proposals || [];
+        const lifecycle = data.lifecycle || {};
+
+        // Update Problem ID input value if search was by mobile
+        if (document.getElementById('track-id') && c.ticket_id) {
+          document.getElementById('track-id').value = c.ticket_id;
+        }
+
+        // 1. Problem Snapshot Metadata
+        setText('track-disp-id', 'ID: ' + c.ticket_id);
+        setText('track-disp-cat', c.category || 'Civic Infrastructure');
+        setText('track-disp-urgency', (c.urgency || 'High') + ' Priority');
+        setText('track-disp-title', c.problem_title);
+        setText('track-disp-desc', c.description || 'No detailed description recorded.');
+        
+        const filingDate = c.created_at ? new Date(c.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent';
+        setText('track-disp-citizen', `Reported by ${c.citizen_name || 'Verified Resident'} • District: ${c.district} • Locality: ${c.locality || 'Ward Area'} • Filed on ${filingDate}`);
+        setText('track-disp-dates', `Registered on: ${filingDate}`);
+        
+        const coordsText = (c.latitude && c.longitude) ? `${Number(c.latitude).toFixed(4)}° N, ${Number(c.longitude).toFixed(4)}° E` : '23.3441° N, 85.3096° E';
+        setText('track-disp-coords', coordsText);
+        setText('track-disp-geotag', `${c.geotag_address || c.locality || c.district} (GPS: ${coordsText})`);
+
+        // Assigned University & Grant
+        const uniEl = document.getElementById('track-disp-uni');
+        const grantEl = document.getElementById('track-disp-grant');
+        const timelineEl = document.getElementById('track-disp-timeline');
+        const statusEl = document.getElementById('track-disp-status');
+        const stageBadge = document.getElementById('track-stepper-stage-badge');
+
+        const assignedName = c.assigned_university_name || '';
+        const grantNum = Number(c.sanctioned_grant || 0);
+
+        if (assignedName) {
+          if (uniEl) uniEl.textContent = assignedName;
+          if (grantEl) grantEl.textContent = `Grant Sanctioned: ₹${grantNum.toLocaleString('en-IN')}`;
+          if (timelineEl) timelineEl.textContent = `Timeline: ${c.milestone_timeline || '14 Days (Rapid Implementation)'}`;
+          if (statusEl) {
+            statusEl.textContent = `● Current: Stage 5 - University Selected`;
+            statusEl.className = "bg-secondary-container text-on-secondary-container px-3 py-0.5 rounded-full text-xs font-bold border border-secondary";
+          }
+          if (stageBadge) stageBadge.textContent = "Stage 5 Active";
+        } else if (proposals.length > 0) {
+          if (uniEl) uniEl.textContent = "State Scrutiny Desk (Evaluating Bids)";
+          if (grantEl) grantEl.textContent = `${proposals.length} University Proposals Received`;
+          if (timelineEl) timelineEl.textContent = `Awaiting Final Allocation`;
+          if (statusEl) {
+            statusEl.textContent = `● Current: Stage 4 - University Proposals Received`;
+            statusEl.className = "bg-primary-fixed text-on-primary-fixed px-3 py-0.5 rounded-full text-xs font-bold border border-primary";
+          }
+          if (stageBadge) stageBadge.textContent = "Stage 4 Active";
+        } else {
+          if (uniEl) uniEl.textContent = "Open for Academic Enrollment";
+          if (grantEl) grantEl.textContent = "Grant Allocation Pending Scrutiny";
+          if (timelineEl) timelineEl.textContent = "Open for University Teams";
+          if (statusEl) {
+            statusEl.textContent = `● Current: Stage 2 - Digital Verification`;
+            statusEl.className = "bg-surface-container px-3 py-0.5 rounded-full text-xs font-bold text-primary border border-outline";
+          }
+          if (stageBadge) stageBadge.textContent = "Stage 2 Active";
+        }
+
+        // Photo Preview
+        const photoEl = document.getElementById('track-disp-photo');
+        const photoLink = document.getElementById('track-disp-photo-link');
+        const photoUrl = c.photo_url || 'https://images.unsplash.com/photo-1541888946425-d0fbb186c5f7?auto=format&fit=crop&w=800&q=80';
+        if (photoEl) photoEl.src = photoUrl;
+        if (photoLink) photoLink.href = photoUrl;
+
+        // 2. Render Dynamic 9-Stage Stepper
+        renderDynamicStepper(lifecycle);
+
+        // 3. Render Proposals List
+        renderDynamicProposals(proposals);
+
+        // 4. Render Activity Logs
+        renderDynamicActivityLogs(lifecycle.timeline_logs || []);
+
+        // 5. Update Pinpoint Mini-Map
+        updateTrackMiniMap(c.latitude, c.longitude, c.problem_title, c.ticket_id);
+
+        // 6. Handle Multiple Matching Complaints for Mobile
+        const matchBox = document.getElementById('matching-complaints-box');
+        const matchList = document.getElementById('matching-complaints-list');
+        if (data.matching_complaints && data.matching_complaints.length > 1) {
+          if (matchBox) matchBox.classList.remove('hidden');
+          if (matchList) {
+            matchList.innerHTML = data.matching_complaints.map(mc => `
+              <button type="button" onclick="selectDbComplaint('${mc.ticket_id}')" class="px-2.5 py-1 rounded text-xs font-mono font-bold ${mc.ticket_id === c.ticket_id ? 'bg-primary text-on-primary' : 'bg-surface-container-lowest text-primary hover:bg-surface-container-high border border-outline-variant'} shadow-xs flex items-center gap-1.5 transition">
+                <span>${mc.ticket_id}</span>
+                <span class="text-[10px] font-sans opacity-80">(${mc.category})</span>
+              </button>
+            `).join('');
+          }
+        } else {
+          if (matchBox) matchBox.classList.add('hidden');
+        }
+
+      } catch (err) {
+        console.error("Tracking fetch error:", err);
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.textContent = "Fetch Live Status";
+        if (btnIcon) btnIcon.textContent = "search";
+        alert("Failed to connect to tracking server. Please ensure local Apache & MySQL are running.");
+      }
+    }
+
+    function setText(id, text) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    }
+
+    // Dynamic 9-Stage Stepper Renderer
+    function renderDynamicStepper(lifecycle) {
+      const grid = document.getElementById('track-stepper-grid');
+      if (!grid) return;
+
+      const currentStage = lifecycle.current_stage || 2;
+      const stages = lifecycle.stages || {};
+
+      let html = '';
+      for (let i = 1; i <= 9; i++) {
+        const stage = stages[i] || { number: i, title: `Stage ${i}`, title_hi: '', status_label: '', icon: 'circle' };
+        const isDone = i < currentStage;
+        const isActive = i === currentStage;
+        const isUpcoming = i > currentStage;
+
+        if (isDone) {
+          html += `
+            <div class="flex flex-col items-center text-center group">
+              <div class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-bold text-xs mb-2 shadow-sm ring-4 ring-secondary/20">
+                <span class="material-symbols-outlined text-[20px]">check</span>
+              </div>
+              <span class="font-bold text-xs text-primary">${stage.number}. ${stage.title}</span>
+              <span class="text-[11px] text-secondary font-semibold">${stage.status_label || 'Completed'}</span>
+            </div>
+          `;
+        } else if (isActive) {
+          html += `
+            <div class="flex flex-col items-center text-center group">
+              <div class="w-12 h-12 -mt-1 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-sm mb-2 shadow-md ring-4 ring-secondary animate-pulse">
+                <span class="material-symbols-outlined text-[22px]">${stage.icon || 'school'}</span>
+              </div>
+              <span class="font-bold text-xs text-secondary font-bold">${stage.number}. ${stage.title}</span>
+              <span class="text-[11px] font-bold text-primary bg-secondary-fixed/40 px-1.5 py-0.5 rounded truncate max-w-[120px]" title="${stage.status_label || 'Active'}">
+                ${stage.status_label || 'In Progress'}
+              </span>
+            </div>
+          `;
+        } else {
+          html += `
+            <div class="flex flex-col items-center text-center opacity-60">
+              <div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold text-xs mb-2 border border-outline">
+                ${stage.number}
+              </div>
+              <span class="font-bold text-xs text-on-surface">${stage.number}. ${stage.title}</span>
+              <span class="text-[11px] text-outline">${stage.status_label || 'Upcoming'}</span>
+            </div>
+          `;
+        }
+      }
+
+      grid.innerHTML = html;
+
+      // Update Milestone Banner
+      const activeStageObj = stages[currentStage];
+      if (activeStageObj) {
+        setText('track-milestone-title', `Current Milestone: Stage ${currentStage} - ${activeStageObj.title} (${activeStageObj.title_hi})`);
+        setText('track-milestone-desc', activeStageObj.summary || 'Under active governance & university evaluation.');
+      }
+    }
+
+    // Dynamic University Proposals Renderer
+    function renderDynamicProposals(proposals) {
+      const list = document.getElementById('track-proposals-list');
+      const countBadge = document.getElementById('track-proposals-count');
+      if (!list) return;
+
+      if (countBadge) {
+        countBadge.textContent = `${proposals.length} Proposal${proposals.length === 1 ? '' : 's'}`;
+      }
+
+      if (!proposals || proposals.length === 0) {
+        list.innerHTML = `
+          <div class="p-6 bg-surface-container-low rounded-xl border border-outline-variant/70 text-center">
+            <span class="material-symbols-outlined text-secondary text-[32px] mb-1">local_library</span>
+            <h5 class="font-bold text-primary text-sm">Open for University Enrollment</h5>
+            <p class="text-xs text-on-surface-variant mt-1 max-w-md mx-auto">
+              This problem is published across Jharkhand engineering colleges. Student & faculty pods can enroll from the University Portal to submit solution blueprints.
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = proposals.map((p, idx) => {
+        const isAssigned = (p.status === 'Assigned');
+        const costNum = Number(p.estimated_cost || 0);
+        return `
+          <div class="p-4 rounded-xl border-2 ${isAssigned ? 'border-secondary bg-secondary/5 ring-1 ring-secondary/20' : 'border-outline-variant bg-surface-container-low'} shadow-xs flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-3 mb-2">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-xs font-bold text-primary">${p.university_name}</span>
+                  ${isAssigned ? '<span class="text-[10px] font-bold uppercase tracking-wider text-secondary bg-secondary-container px-2 py-0.5 rounded-full border border-secondary/40">Officially Selected</span>' : '<span class="text-[10px] font-bold uppercase tracking-wider text-outline bg-surface-container px-2 py-0.5 rounded">Candidate Bid</span>'}
+                </div>
+                <h5 class="font-bold text-sm text-primary leading-snug">${p.proposal_title}</h5>
+                <p class="text-xs text-on-surface-variant mt-1">Lead: <span class="font-medium text-primary">${p.faculty_lead}</span> • Team: <span class="font-medium text-primary">${p.student_count || 5} Student Researchers</span></p>
+              </div>
+              <div class="text-right whitespace-nowrap">
+                <span class="text-sm font-bold text-secondary font-mono">₹${costNum.toLocaleString('en-IN')}</span>
+                <span class="text-[11px] text-outline block">${p.timeline}</span>
+                <span class="inline-block mt-1 text-[10px] font-bold text-primary bg-primary-fixed px-1.5 py-0.2 rounded">${p.match_score || 90}% Match</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Dynamic Activity Logs Renderer
+    function renderDynamicActivityLogs(logs) {
+      const container = document.getElementById('track-activity-log-container');
+      if (!container) return;
+
+      if (!logs || logs.length === 0) {
+        container.innerHTML = `<p class="text-on-surface-variant text-center py-2">No activity records logged yet.</p>`;
+        return;
+      }
+
+      container.innerHTML = logs.map(log => `
+        <div class="p-3 bg-surface-container-low rounded-lg border border-outline-variant flex items-start justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-0.5">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-secondary bg-secondary/10 px-1.5 py-0.2 rounded">${log.stage}</span>
+              <span class="font-bold text-primary text-xs">${log.title}</span>
+            </div>
+            <p class="text-[11px] text-on-surface-variant leading-relaxed">${log.desc}</p>
+          </div>
+          <span class="text-outline font-mono text-[10px] whitespace-nowrap">${log.time}</span>
+        </div>
+      `).join('');
+    }
+
+    // Dynamic Leaflet Mini-Map Pinpoint
+    function updateTrackMiniMap(lat, lng, title, ticketId) {
+      const mapContainer = document.getElementById('track-mini-map');
+      if (!mapContainer || !window.L) return;
+
+      const validLat = (lat && !isNaN(lat)) ? parseFloat(lat) : 23.3441;
+      const validLng = (lng && !isNaN(lng)) ? parseFloat(lng) : 85.3096;
+
+      if (!trackMiniMap) {
+        trackMiniMap = L.map('track-mini-map', {
+          zoomControl: true,
+          attributionControl: false
+        }).setView([validLat, validLng], 14);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19
+        }).addTo(trackMiniMap);
+      } else {
+        trackMiniMap.setView([validLat, validLng], 14);
+      }
+
+      if (trackMarker) {
+        trackMiniMap.removeLayer(trackMarker);
+      }
+
+      trackMarker = L.marker([validLat, validLng]).addTo(trackMiniMap);
+      trackMarker.bindPopup(`<b>${ticketId}</b><br><span style="font-size:12px;">${title}</span>`).openPopup();
+
+      setTimeout(() => {
+        if (trackMiniMap) trackMiniMap.invalidateSize();
+      }, 300);
+    }
+
     function searchExample() {
-      switchMainTab('track-view');
-      document.getElementById('track-id').value = 'JC2C-2026-00125';
-      fetchTrackComplaint('JC2C-2026-00125');
+      selectDbComplaint('JC2C-2026-00125');
     }
 
     // Role Selection Modal & Direct Redirects to login.php

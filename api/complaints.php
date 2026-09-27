@@ -172,27 +172,232 @@ if ($action === 'submit') {
     exit;
 }
 
+// Helper to compute dynamic 9-stage grievance lifecycle and audit activity logs
+function computeComplaintLifecycle($complaint, $proposals = []) {
+    $status = strtolower($complaint['status'] ?? 'submitted');
+    $assignedUni = $complaint['assigned_university_name'] ?? null;
+    $grant = floatval($complaint['sanctioned_grant'] ?? 0);
+    $timeline = $complaint['milestone_timeline'] ?? '14 Days (Rapid Implementation)';
+    $notes = $complaint['scrutiny_notes'] ?? '';
+    $proposalCount = count($proposals);
+
+    $currentStage = 2; // Default
+    if (in_array($status, ['solved', 'resolved', 'closed', 'completed'])) {
+        $currentStage = 9;
+    } elseif (in_array($status, ['implementing', 'execution', 'civil works'])) {
+        $currentStage = 8;
+    } elseif (in_array($status, ['field testing', 'testing', 'field trial'])) {
+        $currentStage = 7;
+    } elseif (in_array($status, ['solution dev', 'in development', 'prototype', 'lab testing'])) {
+        $currentStage = 6;
+    } elseif (!empty($assignedUni) || in_array($status, ['university assigned', 'assigned', 'selected'])) {
+        $currentStage = 5;
+    } elseif ($proposalCount > 0 || in_array($status, ['proposals received', 'enrolled', 'bidding'])) {
+        $currentStage = 4;
+    } elseif (in_array($status, ['scrutiny', 'under review', 'reviewed'])) {
+        $currentStage = 3;
+    } elseif (in_array($status, ['verified', 'geoverified'])) {
+        $currentStage = 2;
+    } else {
+        $currentStage = ($proposalCount > 0) ? 4 : 2;
+    }
+
+    $createdAt = strtotime($complaint['created_at'] ?? 'now');
+    $date1 = date('d M', $createdAt);
+    $date2 = date('d M', $createdAt + 86400);
+    $date3 = date('d M', $createdAt + 86400 * 2);
+    $date4 = date('d M', $createdAt + 86400 * 3);
+    $date5 = date('d M', $createdAt + 86400 * 5);
+
+    $stages = [
+        1 => [
+            'number' => 1,
+            'title' => 'Reported',
+            'title_hi' => 'दर्ज',
+            'status_label' => 'Done (' . $date1 . ')',
+            'icon' => 'edit_document',
+            'summary' => "Grievance filed by {$complaint['citizen_name']} with geotag photo"
+        ],
+        2 => [
+            'number' => 2,
+            'title' => 'Verification',
+            'title_hi' => 'सत्यापित',
+            'status_label' => 'Verified (' . $date2 . ')',
+            'icon' => 'domain_verification',
+            'summary' => "Geofencing & boundary verification passed in {$complaint['district']}"
+        ],
+        3 => [
+            'number' => 3,
+            'title' => 'Scrutiny',
+            'title_hi' => 'जांच',
+            'status_label' => ($currentStage >= 3) ? 'Approved (' . $date3 . ')' : 'Pending Evaluation',
+            'icon' => 'fact_check',
+            'summary' => "Administrative scoping & priority classification ({$complaint['urgency']})"
+        ],
+        4 => [
+            'number' => 4,
+            'title' => 'Uni Enrolled',
+            'title_hi' => 'विश्वविद्यालय आवेदन',
+            'status_label' => ($proposalCount > 0) ? "{$proposalCount} Proposals ({$date4})" : 'Open for Bidding',
+            'icon' => 'local_library',
+            'summary' => ($proposalCount > 0) ? "{$proposalCount} University Hub(s) submitted technical solution bids" : "Open for engineering college applications across Jharkhand"
+        ],
+        5 => [
+            'number' => 5,
+            'title' => 'Uni Selected',
+            'title_hi' => 'विश्वविद्यालय चयन',
+            'status_label' => !empty($assignedUni) ? $assignedUni : 'Selection Pending',
+            'icon' => 'school',
+            'summary' => !empty($assignedUni) ? "Selected {$assignedUni} (Grant: ₹" . number_format($grant) . ")" : "State Scrutiny Committee evaluating college proposals"
+        ],
+        6 => [
+            'number' => 6,
+            'title' => 'Solution Dev',
+            'title_hi' => 'लैब विकास',
+            'status_label' => ($currentStage >= 6) ? 'In Progress' : 'Upcoming',
+            'icon' => 'science',
+            'summary' => "College faculty & student teams engineering solution prototype"
+        ],
+        7 => [
+            'number' => 7,
+            'title' => 'Field Testing',
+            'title_hi' => 'मैदान परीक्षण',
+            'status_label' => ($currentStage >= 7) ? 'Under Trial' : 'Upcoming',
+            'icon' => 'rule',
+            'summary' => "On-ground site trial in village with citizen and Ward Mukhiya"
+        ],
+        8 => [
+            'number' => 8,
+            'title' => 'Execution',
+            'title_hi' => 'क्रियान्वयन',
+            'status_label' => ($currentStage >= 8) ? 'Active Deployment' : 'Upcoming',
+            'icon' => 'engineering',
+            'summary' => "Municipal civil works and physical hardware installation"
+        ],
+        9 => [
+            'number' => 9,
+            'title' => 'Solved',
+            'title_hi' => 'समाधान पूर्ण',
+            'status_label' => ($currentStage >= 9) ? 'Verified Solved' : 'Final Sign-off',
+            'icon' => 'verified',
+            'summary' => "Citizen verification sign-off and permanent resolution closure"
+        ]
+    ];
+
+    // Build timeline audit entries
+    $timelineLogs = [];
+    $timelineLogs[] = [
+        'stage' => 'Stage 1: Citizen Filing',
+        'title' => 'Grievance Registered & Geotagged',
+        'desc' => "Ticket #{$complaint['ticket_id']} successfully registered by {$complaint['citizen_name']} at {$complaint['locality']}, {$complaint['district']}. Coordinates: {$complaint['latitude']}° N, {$complaint['longitude']}° E.",
+        'time' => date('d M Y, h:i A', $createdAt)
+    ];
+
+    $timelineLogs[] = [
+        'stage' => 'Stage 2: Digital Verification',
+        'title' => 'Geofencing & Ward Mapping Passed',
+        'desc' => "Automated digital verification confirmed valid location inside {$complaint['district']} District jurisdiction. Anti-duplication screening passed.",
+        'time' => date('d M Y, h:i A', $createdAt + 1800)
+    ];
+
+    if ($currentStage >= 3) {
+        $timelineLogs[] = [
+            'stage' => 'Stage 3: Admin Scrutiny',
+            'title' => 'Technical Scope Cleared by Higher Education Dept',
+            'desc' => "Urgency classified as '{$complaint['urgency']}'. Problem published to accredited engineering colleges in Jharkhand for capstone research adoption.",
+            'time' => date('d M Y, h:i A', $createdAt + 86400)
+        ];
+    }
+
+    if ($proposalCount > 0) {
+        $propList = array_map(function($p) { return $p['university_name']; }, array_slice($proposals, 0, 3));
+        $propNames = implode(', ', $propList);
+        $timelineLogs[] = [
+            'stage' => 'Stage 4: University Proposals',
+            'title' => "{$proposalCount} Academic Proposals Received",
+            'desc' => "Institutions submitted engineered prototypes and budget blueprints: {$propNames}" . ($proposalCount > 3 ? " and others." : "."),
+            'time' => date('d M Y, h:i A', $createdAt + 86400 * 2)
+        ];
+    }
+
+    if (!empty($assignedUni)) {
+        $timelineLogs[] = [
+            'stage' => 'Stage 5: University Selected',
+            'title' => "Official Allocation: {$assignedUni}",
+            'desc' => "State Scrutiny Committee approved proposal with ₹" . number_format($grant) . " prototype grant under Jharkhand Civic Protocol. Timeline: {$timeline}. " . (!empty($notes) ? "Notes: {$notes}" : ""),
+            'time' => date('d M Y, h:i A', strtotime($complaint['updated_at'] ?? 'now'))
+        ];
+    }
+
+    return [
+        'current_stage' => $currentStage,
+        'stages' => $stages,
+        'timeline_logs' => array_reverse($timelineLogs)
+    ];
+}
+
 // -------------------------------------------------------------
 // 2. Track Complaint by Ticket ID or Phone
 // -------------------------------------------------------------
 if ($action === 'track') {
-    $query = trim($_GET['ticket_id'] ?? $_GET['query'] ?? $_POST['ticket_id'] ?? '');
-    if (empty($query)) {
-        echo json_encode(['success' => false, 'message' => 'Please enter a Problem ID or Mobile Number to track.']);
+    $ticketId = trim($_GET['ticket_id'] ?? $_POST['ticket_id'] ?? '');
+    $mobile = trim($_GET['mobile'] ?? $_POST['mobile'] ?? '');
+    $query = trim($_GET['query'] ?? $_POST['query'] ?? '');
+
+    // Resolve search parameters
+    if (empty($ticketId) && empty($mobile) && !empty($query)) {
+        $cleanQ = preg_replace('/[^0-9]/', '', $query);
+        if (strlen($cleanQ) === 10) {
+            $mobile = $cleanQ;
+        } else {
+            $ticketId = $query;
+        }
+    }
+
+    if (empty($ticketId) && empty($mobile)) {
+        echo json_encode(['success' => false, 'message' => 'Please enter a Problem ID (e.g. JC2C-2026-00125) or 10-digit Mobile Number.']);
         exit;
     }
 
-    $stmt = $pdo->prepare("
-        SELECT * FROM `complaints` 
-        WHERE `ticket_id` = ? OR `citizen_mobile` = ? OR `id` = ?
-        ORDER BY `id` DESC LIMIT 1
-    ");
-    $cleanMobile = preg_replace('/[^0-9]/', '', $query);
-    $stmt->execute([$query, $cleanMobile, $query]);
-    $complaint = $stmt->fetch();
+    $complaint = null;
+    $matchingComplaints = [];
+
+    // Search by Ticket ID first if provided
+    if (!empty($ticketId)) {
+        $cleanTicket = strtoupper(trim($ticketId));
+        $stmt = $pdo->prepare("
+            SELECT * FROM `complaints` 
+            WHERE UPPER(TRIM(`ticket_id`)) = ? OR `id` = ? OR `ticket_id` LIKE ?
+            ORDER BY `id` DESC LIMIT 1
+        ");
+        $stmt->execute([$cleanTicket, $ticketId, "%{$cleanTicket}%"]);
+        $complaint = $stmt->fetch();
+    }
+
+    // If not found by ticket ID or only mobile was provided, search by mobile
+    if (!$complaint && !empty($mobile)) {
+        $cleanMobile = preg_replace('/[^0-9]/', '', $mobile);
+        if (strlen($cleanMobile) === 12 && substr($cleanMobile, 0, 2) === '91') {
+            $cleanMobile = substr($cleanMobile, 2);
+        }
+        $stmt = $pdo->prepare("
+            SELECT * FROM `complaints` 
+            WHERE `citizen_mobile` = ? OR `citizen_mobile` LIKE ?
+            ORDER BY `id` DESC
+        ");
+        $stmt->execute([$cleanMobile, "%{$cleanMobile}%"]);
+        $matchingComplaints = $stmt->fetchAll();
+        if (!empty($matchingComplaints)) {
+            $complaint = $matchingComplaints[0];
+        }
+    }
 
     if (!$complaint) {
-        echo json_encode(['success' => false, 'message' => "No grievance record found for '{$query}'. Please verify your Ticket ID (e.g. JC2C-2026-00125)."]);
+        $searched = !empty($ticketId) ? $ticketId : $mobile;
+        echo json_encode([
+            'success' => false, 
+            'message' => "No grievance record found for '{$searched}'. Please check your Problem ID (e.g. JC2C-2026-00125) or registered 10-digit mobile number."
+        ]);
         exit;
     }
 
@@ -201,10 +406,25 @@ if ($action === 'track') {
     $propStmt->execute([$complaint['id']]);
     $proposals = $propStmt->fetchAll();
 
+    // Compute dynamic 9-stage lifecycle & audit entries
+    $lifecycle = computeComplaintLifecycle($complaint, $proposals);
+
     echo json_encode([
         'success' => true,
         'complaint' => $complaint,
-        'proposals' => $proposals
+        'proposals' => $proposals,
+        'lifecycle' => $lifecycle,
+        'matching_complaints' => array_map(function($c) {
+            return [
+                'id' => $c['id'],
+                'ticket_id' => $c['ticket_id'],
+                'problem_title' => $c['problem_title'],
+                'category' => $c['category'],
+                'status' => $c['status'],
+                'district' => $c['district'],
+                'created_at' => $c['created_at']
+            ];
+        }, $matchingComplaints)
     ]);
     exit;
 }

@@ -287,19 +287,19 @@ $user = $_SESSION['c2c_user'] ?? null;
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
 <!-- Left Headline & Actions (7 cols) -->
 <div class="lg:col-span-7 space-y-6">
-<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container border border-outline-variant text-xs text-primary font-semibold">
-<span class="w-2 h-2 rounded-full bg-secondary"></span>
-<span>झारखंड जन-समस्या व विश्वविद्यालय नवाचार समाधान पोर्टल</span>
+<div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-container border border-outline-variant text-xs text-primary font-semibold shadow-xs">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary inline-block animate-pulse"></span>
+<span>झारखंड जन-समस्या व विश्वविद्यालय नवाचार समाधान पोर्टल • Official Civic-Academic Bridge</span>
 </div>
-<h1 class="font-display-lg text-display-lg text-primary tracking-tight leading-[1.15]">
-                Your Problem. <span class="text-secondary">Our Community.</span> Better Jharkhand.
-              </h1>
+<h1 class="font-display-lg text-display-lg text-primary tracking-tight leading-[1.12] font-extrabold">
+Your Problem. <span class="text-secondary">Community Solved.</span> <br class="hidden sm:inline"/>Better Jharkhand.
+</h1>
 <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl leading-relaxed">
-                Report local civic issues—from dry handpumps and damaged culverts to school sanitation. Empower 148+ state engineering &amp; science universities to develop verifiable, engineered solutions for your panchayat.
-              </p>
+Report local civic issues—from broken handpumps and damaged culverts to rural school sanitation. Empower 148+ state engineering &amp; science universities to develop verifiable, engineered solutions for your panchayat.
+</p>
 <!-- Two Accessible High-Contrast CTAs -->
-<div class="flex flex-wrap items-center gap-4 pt-2">
-<button class="flex items-center gap-2.5 bg-secondary hover:bg-secondary/90 text-on-secondary font-label-lg text-label-lg px-6 py-3.5 rounded-lg shadow-sm border-2 border-secondary transition-all active:scale-[0.99]" onclick="switchMainTab('report-view')" type="button">
+<div class="flex flex-wrap items-center gap-4 pt-1">
+<button class="flex items-center gap-2.5 bg-secondary hover:bg-secondary/90 text-on-secondary font-label-lg text-label-lg px-6 py-3.5 rounded-lg shadow-sm border-2 border-secondary transition-all active:scale-[0.99]" onclick="handleReportInitiate()" type="button">
 <span class="material-symbols-outlined text-[24px]">assignment_add</span>
 <span>Report a Problem (समस्या दर्ज करें)</span>
 </button>
@@ -309,218 +309,425 @@ $user = $_SESSION['c2c_user'] ?? null;
 </button>
 </div>
 <!-- Quick Voice/Microphone Accessible Search Bar -->
-<div class="pt-4 max-w-xl">
-<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1 font-bold" for="hero-search">
-                  Quick Search by Problem ID, Village, or Ward (खोजें):
-                </label>
+<div class="pt-2 max-w-xl">
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1.5 font-bold" for="hero-search">
+Quick Search by Problem ID, Village, or Ward (खोजें):
+</label>
 <div class="relative flex items-center">
 <span class="material-symbols-outlined absolute left-3.5 text-outline text-[22px]">search</span>
-<input class="w-full bg-surface-container-lowest border-2 border-outline/60 rounded-xl pl-11 pr-24 py-3 text-body-md text-on-surface placeholder:text-outline focus:border-primary focus:ring-2 focus:ring-primary/20" id="hero-search" placeholder="e.g. JC2C-2026-00125 or 'Ratu Road Ranchi'" type="text"/>
+<input class="w-full bg-surface-container-lowest border-2 border-outline/60 rounded-xl pl-11 pr-24 py-3 text-body-md text-on-surface placeholder:text-outline focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-xs" id="hero-search" placeholder="e.g. JC2C-2026-00125 or 'Ratu Road Ranchi'" type="text" onkeydown="if(event.key==='Enter') searchHeroQuery()"/>
 <div class="absolute right-2 flex items-center gap-1">
-<button aria-label="Search by voice" class="p-2 text-primary hover:bg-surface-container-high rounded-lg transition" onclick="alert('Voice search activated. Speak your problem location or tracking code...')" title="Speak problem name in Hindi or English" type="button">
+<button aria-label="Search by voice" class="p-2 text-primary hover:bg-surface-container-high rounded-lg transition" onclick="triggerVoiceSearch()" title="Speak problem name in Hindi or English" type="button">
 <span class="material-symbols-outlined text-[22px]">mic</span>
 </button>
-<button class="bg-primary text-on-primary px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-primary-container" onclick="searchExample()" type="button">
-                      Find
-                    </button>
+<button class="bg-primary text-on-primary px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-primary-container" onclick="searchHeroQuery()" type="button">
+Find
+</button>
 </div>
 </div>
+<!-- Quick Search Suggestions -->
+<div class="flex flex-wrap items-center gap-1.5 mt-2.5 text-xs text-on-surface-variant">
+<span class="font-medium text-outline">Quick examples:</span>
+<button type="button" onclick="quickHeroSearch('Water')" class="hover:text-secondary hover:underline bg-surface-container px-2 py-0.5 rounded text-[11px] font-medium">Water Supply</button>
+<button type="button" onclick="quickHeroSearch('Angara')" class="hover:text-secondary hover:underline bg-surface-container px-2 py-0.5 rounded text-[11px] font-medium">Angara Panchayat</button>
+<button type="button" onclick="quickHeroSearch('JC2C-2026-00125')" class="hover:text-secondary hover:underline bg-surface-container px-2 py-0.5 rounded text-[11px] font-medium">Ticket #00125</button>
+<button type="button" onclick="quickHeroSearch('BIT Mesra')" class="hover:text-secondary hover:underline bg-surface-container px-2 py-0.5 rounded text-[11px] font-medium">BIT Mesra</button>
 </div>
 </div>
-<!-- Right: Interactive Civic Stats Card & Workflow Snapshot (5 cols) -->
+<!-- Trust badges strip -->
+<div class="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2 border-t border-outline-variant/60 text-xs font-semibold text-on-surface-variant">
+<span class="flex items-center gap-1 text-secondary">
+<span class="material-symbols-outlined text-[16px]">verified_user</span> 100% Verified Citizen Submissions
+</span>
+<span class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[16px]">school</span> AICTE &amp; UGC Academic Credits
+</span>
+<span class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">sms</span> Real-time SMS &amp; WhatsApp Alerts
+</span>
+</div>
+</div>
+
+<!-- Right: Civic Innovation Pathway & University Network Card (5 cols) -->
 <div class="lg:col-span-5">
-<div class="bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-6 shadow-sm relative">
-<div class="flex items-center justify-between border-b border-outline-variant pb-4 mb-5">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-secondary text-[24px]">verified</span>
-<h2 class="font-headline-sm text-headline-sm text-primary font-bold">Live State Civic Counters</h2>
-</div>
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-secondary-container text-on-secondary-container">
-<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span> Live Sync
-                  </span>
-</div>
-<!-- 4 Live Civic Counters -->
-<div class="grid grid-cols-2 gap-4">
-<div class="bg-surface-container-low p-4 rounded-lg border border-outline-variant/60">
-<div class="flex items-center justify-between text-on-surface-variant mb-1">
-<span class="font-label-sm text-label-sm">Problems Reported</span>
-<span class="material-symbols-outlined text-primary text-[20px]">report_problem</span>
-</div>
-<div class="font-headline-xl text-headline-xl text-primary font-bold">4,821</div>
-<div class="text-[12px] text-secondary font-semibold mt-1">↑ 124 this week</div>
-</div>
-<div class="bg-surface-container-low p-4 rounded-lg border border-outline-variant/60">
-<div class="flex items-center justify-between text-on-surface-variant mb-1">
-<span class="font-label-sm text-label-sm">Solved by Universities</span>
-<span class="material-symbols-outlined text-secondary text-[20px]">task_alt</span>
-</div>
-<div class="font-headline-xl text-headline-xl text-secondary font-bold">2,914</div>
-<div class="text-[12px] text-on-surface-variant font-medium mt-1">60.4% Resolution rate</div>
-</div>
-<div class="bg-surface-container-low p-4 rounded-lg border border-outline-variant/60">
-<div class="flex items-center justify-between text-on-surface-variant mb-1">
-<span class="font-label-sm text-label-sm">Active College Teams</span>
-<span class="material-symbols-outlined text-primary text-[20px]">school</span>
-</div>
-<div class="font-headline-xl text-headline-xl text-primary font-bold">148</div>
-<div class="text-[12px] text-outline font-medium mt-1">Engineering &amp; Tech Hubs</div>
-</div>
-<div class="bg-surface-container-low p-4 rounded-lg border border-outline-variant/60">
-<div class="flex items-center justify-between text-on-surface-variant mb-1">
-<span class="font-label-sm text-label-sm">Districts Covered</span>
-<span class="material-symbols-outlined text-secondary text-[20px]">map</span>
-</div>
-<div class="font-headline-xl text-headline-xl text-primary font-bold">24 / 24</div>
-<div class="text-[12px] text-secondary font-bold mt-1">100% State Coverage</div>
-</div>
-</div>
-<!-- Instant Resolution Spotlight -->
-<div class="mt-5 p-3.5 bg-surface-container rounded-lg border border-outline-variant flex items-center justify-between">
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-bold">
-<span class="material-symbols-outlined text-[20px]">engineering</span>
+<div class="bg-surface-container-lowest border-2 border-primary/20 rounded-2xl p-6 md:p-7 shadow-lg relative overflow-hidden">
+<!-- Subtle civic watermark / accent glow -->
+<div class="absolute -top-12 -right-12 w-40 h-40 bg-secondary/10 rounded-full blur-2xl pointer-events-none"></div>
+
+<div class="flex items-center justify-between border-b border-outline-variant pb-4 mb-5 relative z-10">
+<div class="flex items-center gap-2.5">
+<div class="w-10 h-10 rounded-xl bg-primary text-on-primary flex items-center justify-center font-bold shadow-sm">
+<span class="material-symbols-outlined text-[22px]">account_tree</span>
 </div>
 <div>
-<span class="block text-xs font-bold text-primary">Latest Verified Solution: BIT Mesra</span>
-<span class="block text-[11px] text-on-surface-variant">Solar automated chlorination plant for Angara Panchayat</span>
+<h2 class="font-headline-sm text-primary font-bold text-[17px] leading-tight">Civic Innovation Pathway</h2>
+<span class="text-[11px] text-on-surface-variant font-medium">समाधान यात्रा: नागरिक से विश्वविद्यालय तक</span>
 </div>
 </div>
-<span class="text-xs bg-surface-container-lowest text-secondary font-bold px-2 py-1 rounded border border-outline-variant">Verified</span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-surface-container text-primary border border-outline-variant">
+Govt of Jharkhand
+</span>
+</div>
+
+<!-- 3-Step Interactive Solution Journey -->
+<div class="space-y-3 relative z-10">
+<!-- Step 1 -->
+<div class="flex items-start gap-3 p-3.5 rounded-xl bg-surface-container-low border border-outline-variant/60 hover:border-secondary transition">
+<div class="w-7 h-7 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+1
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold text-primary">Citizen Logs In &amp; Reports</span>
+<span class="text-[10px] bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded font-bold">Verified Account</span>
+</div>
+<p class="text-[12px] text-on-surface-variant mt-0.5 leading-snug">Resident signs in with mobile OTP, captures live GPS coordinates and photo evidence.</p>
+</div>
+</div>
+
+<!-- Step 2 -->
+<div class="flex items-start gap-3 p-3.5 rounded-xl bg-surface-container-low border border-outline-variant/60 hover:border-primary transition">
+<div class="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+2
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold text-primary">Top Universities Blueprint Solutions</span>
+<span class="text-[10px] bg-primary-fixed text-on-primary-fixed px-2 py-0.5 rounded font-bold">R&amp;D Hubs</span>
+</div>
+<p class="text-[12px] text-on-surface-variant mt-0.5 leading-snug">Engineering faculty and student cells formulate low-cost, engineered solution blueprints.</p>
+</div>
+</div>
+
+<!-- Step 3 -->
+<div class="flex items-start gap-3 p-3.5 rounded-xl bg-surface-container-low border border-outline-variant/60 hover:border-secondary transition">
+<div class="w-7 h-7 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+3
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold text-primary">Govt Sanctions &amp; On-Ground Delivery</span>
+<span class="text-[10px] bg-surface-container-highest text-primary px-2 py-0.5 rounded font-bold">Transparent Grant</span>
+</div>
+<p class="text-[12px] text-on-surface-variant mt-0.5 leading-snug">District administration approves funds; tested solution is implemented directly in the panchayat.</p>
+</div>
+</div>
+</div>
+
+<!-- Participating Engineering Hubs Badges -->
+<div class="mt-4 pt-3.5 border-t border-outline-variant">
+<div class="flex items-center justify-between mb-2">
+<span class="text-[11px] font-bold text-outline uppercase tracking-wider">Academic Innovation Network:</span>
+<button type="button" onclick="switchMainTab('how-view')" class="text-[11px] font-bold text-secondary hover:underline flex items-center gap-0.5">
+Learn How We Solve <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+<div class="flex flex-wrap gap-1.5">
+<span class="text-[11px] font-semibold bg-surface-container px-2.5 py-1 rounded-md text-primary border border-outline-variant/60">BIT Mesra</span>
+<span class="text-[11px] font-semibold bg-surface-container px-2.5 py-1 rounded-md text-primary border border-outline-variant/60">NIT Jamshedpur</span>
+<span class="text-[11px] font-semibold bg-surface-container px-2.5 py-1 rounded-md text-primary border border-outline-variant/60">IIT (ISM) Dhanbad</span>
+<span class="text-[11px] font-semibold bg-surface-container px-2.5 py-1 rounded-md text-primary border border-outline-variant/60">Ranchi University</span>
+</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </section>
+
 <!-- 4. Problem Categories Grid (10 Institutional Categories) -->
 <section class="py-14 bg-background max-w-[1280px] mx-auto px-gutter">
 <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-3 border-b border-outline-variant pb-4">
 <div>
-<span class="text-secondary font-bold uppercase tracking-wider text-xs">Citizen Issue Directory</span>
+<span class="text-secondary font-bold uppercase tracking-wider text-xs">Citizen Issue Directory • नागरिक समस्या निर्देशिका</span>
 <h2 class="font-headline-lg text-headline-lg text-primary font-bold mt-1">Select Problem Category (समस्या वर्ग चुनें)</h2>
-<p class="font-body-sm text-body-sm text-on-surface-variant">Click any category to initiate a direct problem report or browse active university projects.</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Click any category to initiate a verified problem report or browse active university projects.</p>
 </div>
 <span class="text-xs font-semibold text-outline">10 Recognized Civic Portfolios</span>
 </div>
 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
 <!-- Category 1: Water -->
-<button class="flex flex-col text-left p-4 bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant hover:border-primary rounded-xl transition duration-150 group shadow-sm" onclick="selectCategoryAndReport('Water &amp; Supply')" type="button">
+<button class="flex flex-col text-left p-4 bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant hover:border-primary rounded-xl transition duration-150 group shadow-sm hover:shadow-md" onclick="handleCategoryClick('Water')" type="button">
 <div class="w-12 h-12 rounded-lg bg-surface-container text-primary flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-on-primary transition">
 <span class="material-symbols-outlined text-[28px]">water_drop</span>
 </div>
 <span class="font-headline-sm text-headline-sm text-primary font-bold text-[17px]">Water</span>
 <span class="text-xs text-on-surface-variant font-medium mt-0.5">पेयजल एवं जल आपूर्ति</span>
-<span class="text-[11px] text-secondary font-bold mt-2">612 Resolved</span>
+<span class="text-[11px] text-secondary font-bold mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">task_alt</span> 612 Resolved
+</span>
 </button>
 <!-- Category 2: Roads -->
-<button class="flex flex-col text-left p-4 bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant hover:border-primary rounded-xl transition duration-150 group shadow-sm" onclick="selectCategoryAndReport('Roads &amp; Transport')" type="button">
+<button class="flex flex-col text-left p-4 bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant hover:border-primary rounded-xl transition duration-150 group shadow-sm hover:shadow-md" onclick="handleCategoryClick('Roads')" type="button">
 <div class="w-12 h-12 rounded-lg bg-surface-container text-primary flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-on-primary transition">
 <span class="material-symbols-outlined text-[28px]">add_road</span>
 </div>
 <span class="font-headline-sm text-headline-sm text-primary font-bold text-[17px]">Roads</span>
 <span class="text-xs text-on-surface-variant font-medium mt-0.5">सड़क एवं परिवहन</span>
-<span class="text-[11px] text-secondary font-bold mt-2">840 Resolved</span>
+<span class="text-[11px] text-secondary font-bold mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">task_alt</span> 840 Resolved
+</span>
 </button>
 <!-- Category 3: Waste Management -->
-<button class="flex flex-col text-left p-4 bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant hover:border-primary rounded-xl transition duration-150 group shadow-sm" onclick="selectCategoryAndReport('Waste Management')" type="button">
+<button class="flex flex-col text-left p-4 bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant hover:border-primary rounded-xl transition duration-150 group shadow-sm hover:shadow-md" onclick="handleCategoryClick('Waste')" type="button">
 <div class="w-12 h-12 rounded-lg bg-surface-container text-primary flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-on-primary transition">
 <span class="material-symbols-outlined text-[28px]">delete_sweep</span>
 </div>
 <span class="font-headline-sm text-headline-sm text-primary font-bold text-[17px]">Waste Mgmt</span>
 <span class="text-xs text-on-surface-variant font-medium mt-0.5">ठोस कचरा प्रबंधन</span>
-<span class="text-[11px] text-secondary font-bold mt-2">395 Resolved</span>
+<span class="text-[11px] text-secondary font-bold mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">task_alt</span> 395 Resolved
+</span>
 </button>
 <!-- Category 4: Agriculture -->
-<button class="flex flex-col text-left p-4 bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant hover:border-primary rounded-xl transition duration-150 group shadow-sm" onclick="selectCategoryAndReport('Agriculture')" type="button">
+<button class="flex flex-col text-left p-4 bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant hover:border-primary rounded-xl transition duration-150 group shadow-sm hover:shadow-md" onclick="handleCategoryClick('Agriculture')" type="button">
 <div class="w-12 h-12 rounded-lg bg-surface-container text-primary flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-on-primary transition">
 <span class="material-symbols-outlined text-[28px]">agriculture</span>
 </div>
 <span class="font-headline-sm text-headline-sm text-primary font-bold text-[17px]">Agriculture</span>
 <span class="text-xs text-on-surface-variant font-medium mt-0.5">कृषि एवं सिंचाई</span>
-<span class="text-[11px] text-secondary font-bold mt-2">520 Resolved</span>
+<span class="text-[11px] text-secondary font-bold mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">task_alt</span> 520 Resolved
+</span>
 </button>
 <!-- Category 5: NGO & Social Issues -->
-<button class="flex flex-col text-left p-4 bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant hover:border-primary rounded-xl transition duration-150 group shadow-sm" onclick="selectCategoryAndReport('Social Welfare')" type="button">
+<button class="flex flex-col text-left p-4 bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant hover:border-primary rounded-xl transition duration-150 group shadow-sm hover:shadow-md" onclick="handleCategoryClick('NGO')" type="button">
 <div class="w-12 h-12 rounded-lg bg-surface-container text-primary flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-on-primary transition">
 <span class="material-symbols-outlined text-[28px]">diversity_3</span>
 </div>
 <span class="font-headline-sm text-headline-sm text-primary font-bold text-[17px]">Social Welfare</span>
 <span class="text-xs text-on-surface-variant font-medium mt-0.5">सामाजिक कल्याण</span>
-<span class="text-[11px] text-secondary font-bold mt-2">210 Resolved</span>
+<span class="text-[11px] text-secondary font-bold mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">task_alt</span> 210 Resolved
+</span>
 </button>
 <!-- Category 6: Robotics -->
-<button class="flex flex-col text-left p-4 bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant hover:border-primary rounded-xl transition duration-150 group shadow-sm" onclick="selectCategoryAndReport('Robotics')" type="button">
+<button class="flex flex-col text-left p-4 bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant hover:border-primary rounded-xl transition duration-150 group shadow-sm hover:shadow-md" onclick="handleCategoryClick('Robotics')" type="button">
 <div class="w-12 h-12 rounded-lg bg-surface-container text-primary flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-on-primary transition">
 <span class="material-symbols-outlined text-[28px]">smart_toy</span>
 </div>
 <span class="font-headline-sm text-headline-sm text-primary font-bold text-[17px]">Robotics</span>
 <span class="text-xs text-on-surface-variant font-medium mt-0.5">रोबोटिक्स समाधान</span>
-<span class="text-[11px] text-secondary font-bold mt-2">78 Prototypes</span>
+<span class="text-[11px] text-secondary font-bold mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">task_alt</span> 78 Prototypes
+</span>
 </button>
 <!-- Category 7: Space & Technology -->
-<button class="flex flex-col text-left p-4 bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant hover:border-primary rounded-xl transition duration-150 group shadow-sm" onclick="selectCategoryAndReport('Space &amp; Tech')" type="button">
+<button class="flex flex-col text-left p-4 bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant hover:border-primary rounded-xl transition duration-150 group shadow-sm hover:shadow-md" onclick="handleCategoryClick('Space')" type="button">
 <div class="w-12 h-12 rounded-lg bg-surface-container text-primary flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-on-primary transition">
 <span class="material-symbols-outlined text-[28px]">satellite_alt</span>
 </div>
 <span class="font-headline-sm text-headline-sm text-primary font-bold text-[17px]">Space &amp; Tech</span>
 <span class="text-xs text-on-surface-variant font-medium mt-0.5">अंतरिक्ष व तकनीकी</span>
-<span class="text-[11px] text-secondary font-bold mt-2">45 Projects</span>
+<span class="text-[11px] text-secondary font-bold mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">task_alt</span> 45 Projects
+</span>
 </button>
 <!-- Category 8: Environment -->
-<button class="flex flex-col text-left p-4 bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant hover:border-primary rounded-xl transition duration-150 group shadow-sm" onclick="selectCategoryAndReport('Environment')" type="button">
+<button class="flex flex-col text-left p-4 bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant hover:border-primary rounded-xl transition duration-150 group shadow-sm hover:shadow-md" onclick="handleCategoryClick('Environment')" type="button">
 <div class="w-12 h-12 rounded-lg bg-surface-container text-primary flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-on-primary transition">
 <span class="material-symbols-outlined text-[28px]">forest</span>
 </div>
 <span class="font-headline-sm text-headline-sm text-primary font-bold text-[17px]">Environment</span>
 <span class="text-xs text-on-surface-variant font-medium mt-0.5">पर्यावरण एवं वन</span>
-<span class="text-[11px] text-secondary font-bold mt-2">310 Resolved</span>
+<span class="text-[11px] text-secondary font-bold mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">task_alt</span> 310 Resolved
+</span>
 </button>
 <!-- Category 9: Education -->
-<button class="flex flex-col text-left p-4 bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant hover:border-primary rounded-xl transition duration-150 group shadow-sm" onclick="selectCategoryAndReport('Education')" type="button">
+<button class="flex flex-col text-left p-4 bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant hover:border-primary rounded-xl transition duration-150 group shadow-sm hover:shadow-md" onclick="handleCategoryClick('Education')" type="button">
 <div class="w-12 h-12 rounded-lg bg-surface-container text-primary flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-on-primary transition">
 <span class="material-symbols-outlined text-[28px]">school</span>
 </div>
 <span class="font-headline-sm text-headline-sm text-primary font-bold text-[17px]">Education</span>
 <span class="text-xs text-on-surface-variant font-medium mt-0.5">शिक्षा व कौशल</span>
-<span class="text-[11px] text-secondary font-bold mt-2">415 Solved</span>
+<span class="text-[11px] text-secondary font-bold mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">task_alt</span> 415 Solved
+</span>
 </button>
 <!-- Category 10: Other -->
-<button class="flex flex-col text-left p-4 bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant hover:border-primary rounded-xl transition duration-150 group shadow-sm" onclick="selectCategoryAndReport('Other Public Issues')" type="button">
+<button class="flex flex-col text-left p-4 bg-surface-container-lowest hover:bg-surface-container-low border-2 border-outline-variant hover:border-primary rounded-xl transition duration-150 group shadow-sm hover:shadow-md" onclick="handleCategoryClick('Other')" type="button">
 <div class="w-12 h-12 rounded-lg bg-surface-container text-primary flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-on-primary transition">
 <span class="material-symbols-outlined text-[28px]">more_horiz</span>
 </div>
 <span class="font-headline-sm text-headline-sm text-primary font-bold text-[17px]">Other Issues</span>
 <span class="text-xs text-on-surface-variant font-medium mt-0.5">अन्य सार्वजनिक समस्याएं</span>
-<span class="text-[11px] text-secondary font-bold mt-2">120 Managed</span>
+<span class="text-[11px] text-secondary font-bold mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">task_alt</span> 120 Managed
+</span>
 </button>
 </div>
 </section>
-<!-- Quick Civic Guarantee Section -->
-<section class="bg-surface-container-low border-t border-outline-variant py-10">
-<div class="max-w-[1280px] mx-auto px-gutter grid grid-cols-1 md:grid-cols-3 gap-6">
-<div class="flex items-start gap-4">
-<span class="material-symbols-outlined text-secondary text-[36px]">offline_bolt</span>
+
+<!-- 5. University Engineered Solutions in Action (Featured Case Studies) -->
+<section class="py-12 bg-surface-container-lowest border-t border-outline-variant">
+<div class="max-w-[1280px] mx-auto px-gutter">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-3">
 <div>
-<h3 class="font-headline-sm text-headline-sm text-primary font-bold">24-Hour Scrutiny</h3>
-<p class="text-xs text-on-surface-variant mt-1">Every submitted problem is verified by District Field Officers within 24 hours.</p>
+<span class="text-secondary font-bold uppercase tracking-wider text-xs">Proven Impact • सत्यापित विश्वविद्यालय समाधान</span>
+<h2 class="font-headline-lg text-headline-lg text-primary font-bold mt-1">Real Problems Solved by Jharkhand Colleges</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">See how faculty and student innovation teams deploy low-cost engineering solutions across panchayats.</p>
 </div>
+<a href="#how-it-works" onclick="switchMainTab('how-view')" class="text-xs font-bold text-secondary hover:underline flex items-center gap-1 whitespace-nowrap">
+Browse University Projects <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
 </div>
-<div class="flex items-start gap-4">
-<span class="material-symbols-outlined text-primary text-[36px]">assured_workload</span>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Solution Card 1: BIT Mesra -->
+<div class="bg-surface-container-low border border-outline-variant/80 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:border-secondary transition">
 <div>
-<h3 class="font-headline-sm text-headline-sm text-primary font-bold">Accredited Academic Credits</h3>
-<p class="text-xs text-on-surface-variant mt-1">Participating university students earn official UGC/AICTE community service credits.</p>
+<div class="flex items-center justify-between mb-3">
+<span class="text-[11px] font-bold text-secondary bg-secondary-container px-2.5 py-0.5 rounded-full uppercase tracking-wider">Water &amp; Health</span>
+<span class="text-xs font-bold text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-secondary">verified</span> Verified
+</span>
 </div>
+<h3 class="font-bold text-primary text-base leading-snug">Solar Automated Chlorination &amp; Filtration Plant</h3>
+<p class="text-xs text-secondary font-bold mt-1">BIT Mesra • Dept of Civil &amp; Environmental Engg</p>
+<p class="text-xs text-on-surface-variant mt-3 leading-relaxed">
+Designed a gravity-assisted solar chlorination unit for Angara Panchayat, eliminating biological pathogens and restoring potable tap water to 1,200 rural households.
+</p>
 </div>
-<div class="flex items-start gap-4">
-<span class="material-symbols-outlined text-secondary text-[36px]">security_update_good</span>
+<div class="mt-5 pt-4 border-t border-outline-variant/60 flex items-center justify-between text-xs">
 <div>
-<h3 class="font-headline-sm text-headline-sm text-primary font-bold">Zero Paperwork</h3>
-<p class="text-xs text-on-surface-variant mt-1">Direct SMS status alerts to the citizen's mobile without needing cyber café visits.</p>
+<span class="text-[10px] text-outline block uppercase font-bold">Location</span>
+<span class="font-semibold text-primary">Angara, Ranchi</span>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-outline block uppercase font-bold">Grant Sanctioned</span>
+<span class="font-bold text-secondary">₹85,000</span>
+</div>
+</div>
+</div>
+
+<!-- Solution Card 2: NIT Jamshedpur -->
+<div class="bg-surface-container-low border border-outline-variant/80 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:border-primary transition">
+<div>
+<div class="flex items-center justify-between mb-3">
+<span class="text-[11px] font-bold text-primary bg-primary-fixed px-2.5 py-0.5 rounded-full uppercase tracking-wider">Drainage &amp; IoT</span>
+<span class="text-xs font-bold text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-secondary">verified</span> Field Tested
+</span>
+</div>
+<h3 class="font-bold text-primary text-base leading-snug">IoT Sluice Gate Automation &amp; Flash Flood Regulators</h3>
+<p class="text-xs text-primary font-bold mt-1">NIT Jamshedpur • Civic IoT Innovation Cell</p>
+<p class="text-xs text-on-surface-variant mt-3 leading-relaxed">
+Deployed solar ultrasonic level telemetry sensors that automatically regulate storm drain sluices, preventing annual flash-flooding in Adityapur residential wards.
+</p>
+</div>
+<div class="mt-5 pt-4 border-t border-outline-variant/60 flex items-center justify-between text-xs">
+<div>
+<span class="text-[10px] text-outline block uppercase font-bold">Location</span>
+<span class="font-semibold text-primary">Adityapur, Seraikela</span>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-outline block uppercase font-bold">Grant Sanctioned</span>
+<span class="font-bold text-primary">₹95,000</span>
+</div>
+</div>
+</div>
+
+<!-- Solution Card 3: Birsa Agricultural University -->
+<div class="bg-surface-container-low border border-outline-variant/80 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:border-secondary transition">
+<div>
+<div class="flex items-center justify-between mb-3">
+<span class="text-[11px] font-bold text-tertiary bg-tertiary-fixed px-2.5 py-0.5 rounded-full uppercase tracking-wider">Agri &amp; Irrigation</span>
+<span class="text-xs font-bold text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-secondary">verified</span> Operational
+</span>
+</div>
+<h3 class="font-bold text-primary text-base leading-snug">Low-Cost Gravity Drip-Irrigation for Hilly Tribal Land</h3>
+<p class="text-xs text-secondary font-bold mt-1">Birsa Agricultural University (BAU), Ranchi</p>
+<p class="text-xs text-on-surface-variant mt-3 leading-relaxed">
+Engineered an electricity-free micro-irrigation system utilizing hillside natural pressure gradients, allowing 85 tribal farmers in Murhu block to harvest a second winter crop.
+</p>
+</div>
+<div class="mt-5 pt-4 border-t border-outline-variant/60 flex items-center justify-between text-xs">
+<div>
+<span class="text-[10px] text-outline block uppercase font-bold">Location</span>
+<span class="font-semibold text-primary">Murhu, Khunti</span>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-outline block uppercase font-bold">Grant Sanctioned</span>
+<span class="font-bold text-secondary">₹60,000</span>
+</div>
+</div>
 </div>
 </div>
 </div>
 </section>
+
+<!-- 6. Civic Trust & Guarantees Section (4 Pillars) -->
+<section class="bg-surface-container-low border-t border-outline-variant py-12">
+<div class="max-w-[1280px] mx-auto px-gutter">
+<div class="text-center max-w-2xl mx-auto mb-10">
+<span class="text-secondary font-bold uppercase tracking-wider text-xs">Integrity &amp; Standards • नागरिक भरोसा</span>
+<h2 class="font-headline-lg text-headline-lg text-primary font-bold mt-1">Why Campus2Community Works for Every Citizen</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5">A secure, authenticated government portal ensuring genuine complaints, faculty oversight, and complete financial transparency.</p>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/70 shadow-xs">
+<div class="w-12 h-12 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-[28px] text-secondary">verified_user</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary font-bold text-base">Verified Citizen Identity</h3>
+<p class="text-xs text-on-surface-variant mt-1.5 leading-relaxed">Authentication via mobile OTP &amp; Aadhaar ensures zero false filings and directly links your tracking token.</p>
+</div>
+
+<div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/70 shadow-xs">
+<div class="w-12 h-12 rounded-lg bg-surface-container text-primary flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-[28px] text-primary">engineering</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary font-bold text-base">Academic Rigor &amp; Testing</h3>
+<p class="text-xs text-on-surface-variant mt-1.5 leading-relaxed">Every solution is technically scrutinized by engineering professors before budget sanctioning and field handover.</p>
+</div>
+
+<div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/70 shadow-xs">
+<div class="w-12 h-12 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-[28px] text-secondary">account_balance_wallet</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary font-bold text-base">Transparent Public Grants</h3>
+<p class="text-xs text-on-surface-variant mt-1.5 leading-relaxed">Direct administrative sanctions from district collectorate. View itemized material and deployment costs online.</p>
+</div>
+
+<div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/70 shadow-xs">
+<div class="w-12 h-12 rounded-lg bg-surface-container text-primary flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-[28px] text-primary">security_update_good</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary font-bold text-base">SMS &amp; Geotag Tracking</h3>
+<p class="text-xs text-on-surface-variant mt-1.5 leading-relaxed">Instant SMS updates to your mobile at every scrutiny step. No need to spend money at cyber cafés or district offices.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- 7. State Coverage & Toll-Free Civic Helpline Bar -->
+<section class="bg-primary text-on-primary py-8 border-t border-primary-container">
+<div class="max-w-[1280px] mx-auto px-gutter flex flex-col md:flex-row items-center justify-between gap-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-secondary text-on-secondary flex items-center justify-center font-bold shrink-0">
+<span class="material-symbols-outlined text-[28px]">support_agent</span>
+</div>
+<div>
+<h3 class="font-bold text-base text-on-primary">Need Help Submitting or Tracking a Problem?</h3>
+<p class="text-xs text-surface-container-high mt-0.5">Jharkhand State Civic Helpline is operational Monday–Saturday (9:00 AM – 6:00 PM).</p>
+</div>
+</div>
+<div class="flex flex-wrap items-center gap-4">
+<a href="tel:18003456570" class="flex items-center gap-2 bg-secondary hover:bg-secondary/90 text-on-secondary font-bold text-xs px-5 py-3 rounded-lg shadow-sm transition">
+<span class="material-symbols-outlined text-[18px]">call</span>
+<span>Toll-Free: 1800-345-6570</span>
+</a>
+<a href="mailto:support.c2c@jharkhand.gov.in" class="flex items-center gap-2 bg-primary-container hover:bg-primary-container/80 text-on-primary font-bold text-xs px-4 py-3 rounded-lg border border-outline-variant/40 transition">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+<span>support.c2c@jharkhand.gov.in</span>
+</a>
+</div>
+</div>
+</section>
+</div>
 </div>
 <!-- VIEW CONTAINER 2: TAB 1 - REPORT A PROBLEM (Complaint Form Workflow) -->
 <div class="main-tab-content hidden max-w-[1280px] mx-auto px-gutter py-10" id="report-view">
@@ -539,6 +746,46 @@ $user = $_SESSION['c2c_user'] ?? null;
 <!-- Form Left & Center (8 cols) -->
 <div class="lg:col-span-8 bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-6 md:p-8 shadow-sm">
 <form class="space-y-6" id="problem-report-form" onsubmit="handleProblemSubmit(event)">
+<!-- Auth State Notice -->
+<?php if ($user): ?>
+<div class="p-4 rounded-xl border-2 border-secondary/40 bg-secondary-container/40 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
+  <div class="flex items-center gap-3">
+    <div class="w-10 h-10 rounded-lg bg-secondary text-on-secondary flex items-center justify-center font-bold shrink-0">
+      <span class="material-symbols-outlined text-[22px]">verified_user</span>
+    </div>
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-sm text-primary">Authenticated Citizen: <?= htmlspecialchars($user['name']) ?></span>
+        <span class="bg-secondary text-on-secondary text-[10px] font-bold px-2 py-0.5 rounded uppercase">Verified</span>
+      </div>
+      <p class="text-xs text-on-surface-variant mt-0.5">Linked Mobile: +91 <?= htmlspecialchars($user['mobile']) ?> • District: <?= htmlspecialchars($user['district'] ?? 'Jharkhand') ?></p>
+    </div>
+  </div>
+  <span class="text-xs text-secondary font-bold flex items-center gap-1 shrink-0 bg-surface-container-lowest px-2.5 py-1.5 rounded-lg border border-secondary/30">
+    <span class="material-symbols-outlined text-[16px]">lock_open</span> Authorized to Submit
+  </span>
+</div>
+<?php else: ?>
+<div class="p-4 rounded-xl border-2 border-error/30 bg-error-container/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+  <div class="flex items-start gap-3">
+    <div class="w-10 h-10 rounded-lg bg-error text-on-error flex items-center justify-center font-bold shrink-0">
+      <span class="material-symbols-outlined text-[22px]">lock</span>
+    </div>
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-sm text-error">Citizen Authentication Required</span>
+        <span class="bg-error text-on-error text-[10px] font-bold px-2 py-0.5 rounded uppercase">Guest Mode</span>
+      </div>
+      <p class="text-xs text-on-surface-variant mt-0.5">You are previewing this form in guest mode. Complaints will only be registered after logging in to your verified citizen account.</p>
+    </div>
+  </div>
+  <button type="button" onclick="openLoginRequiredModal()" class="px-4 py-2.5 bg-primary hover:bg-primary-container text-on-primary text-xs font-bold rounded-lg shadow-sm whitespace-nowrap transition active:scale-[0.99] shrink-0 flex items-center gap-1.5">
+    <span class="material-symbols-outlined text-[16px]">login</span>
+    <span>Log In to Submit</span>
+  </button>
+</div>
+<?php endif; ?>
+
 <!-- Hidden GPS & Geotag data for MySQL database -->
 <input type="hidden" id="geo-lat" name="latitude" value="23.3441000"/>
 <input type="hidden" id="geo-lng" name="longitude" value="85.3096000"/>
@@ -612,12 +859,19 @@ $user = $_SESSION['c2c_user'] ?? null;
   Mobile Number / मोबाइल नंबर (OTP सत्यापन) <span class="text-error">*</span>
 </label>
 <div class="relative">
-<input class="w-full h-[52px] bg-surface-container-lowest border-2 border-outline rounded-lg pl-14 pr-24 text-body-md text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20" id="prob-mobile" name="mobile" pattern="[0-9]{10}" required="" type="tel" value="<?= !empty($user['mobile']) ? htmlspecialchars($user['mobile']) : '9876543210' ?>"/>
+<input class="w-full h-[52px] bg-surface-container-lowest border-2 border-outline rounded-lg pl-14 pr-28 text-body-md text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20" id="prob-mobile" name="mobile" pattern="[0-9]{10}" required="" type="tel" value="<?= !empty($user['mobile']) ? htmlspecialchars($user['mobile']) : '' ?>" placeholder="e.g. 9876543210" <?= !empty($user) ? 'readonly' : '' ?>/>
 <span class="absolute left-3.5 top-3.5 text-xs font-bold text-outline">+91</span>
-<button class="absolute right-2 top-2 bg-surface-container text-primary font-bold text-xs px-2.5 py-2 rounded border border-outline-variant hover:bg-surface-container-high" type="button">
-  Verified ✓
+<?php if (!empty($user)): ?>
+<span class="absolute right-2 top-2 bg-secondary/15 text-secondary font-bold text-xs px-2.5 py-2 rounded border border-secondary/30 flex items-center gap-1">
+  <span class="material-symbols-outlined text-[14px]">check</span> Verified
+</span>
+<?php else: ?>
+<button onclick="openLoginRequiredModal()" class="absolute right-2 top-2 bg-primary text-on-primary font-bold text-xs px-2.5 py-2 rounded hover:bg-primary-container transition flex items-center gap-1" type="button">
+  <span class="material-symbols-outlined text-[14px]">lock</span> Login
 </button>
+<?php endif; ?>
 </div>
+<input type="hidden" name="citizen_name" id="prob-citizen-name" value="<?= !empty($user['name']) ? htmlspecialchars($user['name']) : '' ?>"/>
 </div>
 </div>
 
@@ -664,11 +918,18 @@ $user = $_SESSION['c2c_user'] ?? null;
 
 <!-- Submit Button (Primary Affirmative Action) -->
 <div class="pt-4">
+<?php if ($user): ?>
 <button id="submit-problem-btn" class="w-full flex items-center justify-center gap-3 bg-secondary hover:bg-secondary/90 text-on-secondary font-label-lg text-label-lg h-[54px] rounded-lg shadow-sm border-2 border-secondary font-bold transition active:scale-[0.99]" type="submit">
   <span class="material-symbols-outlined text-[24px]">send</span>
   <span id="submit-btn-label">Submit Grievance to University Hub (समस्या दर्ज करें)</span>
 </button>
-<p class="text-center text-xs text-outline mt-2">By clicking submit, you verify the information under Jharkhand Citizen Grievance Act 2021.</p>
+<?php else: ?>
+<button id="submit-problem-btn" onclick="event.preventDefault(); openLoginRequiredModal();" class="w-full flex items-center justify-center gap-3 bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg h-[54px] rounded-lg shadow-sm border-2 border-primary font-bold transition active:scale-[0.99]" type="button">
+  <span class="material-symbols-outlined text-[22px]">lock</span>
+  <span id="submit-btn-label">Log In to Submit Grievance (लॉगिन आवश्यक है)</span>
+</button>
+<?php endif; ?>
+<p class="text-center text-xs text-outline mt-2">By submitting, you verify the information under Jharkhand Citizen Grievance Redressal Act.</p>
 </div>
 </form>
 </div>
@@ -1439,6 +1700,72 @@ $user = $_SESSION['c2c_user'] ?? null;
 </div>
 </div>
 </dialog>
+
+<!-- 7.5 Citizen Login Required Modal -->
+<dialog class="fixed inset-0 m-auto bg-transparent backdrop:bg-primary/70 backdrop:backdrop-blur-sm p-4 z-[75] max-w-lg w-full" id="login-required-modal">
+<div class="bg-surface-container-lowest border-2 border-primary/30 rounded-2xl p-6 md:p-8 shadow-2xl relative">
+<div class="flex items-center justify-between border-b border-outline-variant pb-3 mb-5">
+<div class="flex items-center gap-3">
+  <div class="w-10 h-10 rounded-xl bg-primary text-on-primary flex items-center justify-center font-bold shadow-xs">
+    <span class="material-symbols-outlined text-[24px]">lock</span>
+  </div>
+  <div>
+    <span class="text-xs font-bold text-secondary uppercase tracking-wider block">Citizen Authentication Required</span>
+    <h3 class="font-headline-md text-primary font-bold text-lg leading-tight">नागरिक लॉगिन आवश्यक है</h3>
+  </div>
+</div>
+<button class="text-on-surface-variant hover:bg-surface-container p-1 rounded-lg transition" onclick="closeLoginRequiredModal()" type="button">
+  <span class="material-symbols-outlined text-[22px]">close</span>
+</button>
+</div>
+
+<p class="text-xs text-on-surface-variant leading-relaxed mb-5">
+Under the Jharkhand State Civic Redressal guidelines, grievances can only be registered through a verified citizen account to prevent duplicate submissions, ensure authentic GPS mapping, and send SMS tracking alerts.
+</p>
+
+<div class="space-y-3">
+<a href="login.php?role=user&redirect=report" class="w-full flex items-center justify-between p-3.5 rounded-xl border-2 border-primary bg-primary text-on-primary hover:bg-primary-container transition group shadow-sm">
+  <div class="flex items-center gap-3">
+    <span class="material-symbols-outlined text-[24px]">login</span>
+    <div class="text-left">
+      <div class="font-bold text-xs">Log In to Your Citizen Account</div>
+      <div class="text-[11px] text-surface-container-high">Sign in with Mobile OTP or Password</div>
+    </div>
+  </div>
+  <span class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+
+<a href="login.php?role=user&mode=register&redirect=report" class="w-full flex items-center justify-between p-3.5 rounded-xl border-2 border-outline-variant hover:border-secondary bg-surface-container-lowest hover:bg-surface-container-low transition text-primary group">
+  <div class="flex items-center gap-3">
+    <span class="material-symbols-outlined text-[24px] text-secondary">person_add</span>
+    <div class="text-left">
+      <div class="font-bold text-xs text-primary">Register New Citizen Account</div>
+      <div class="text-[11px] text-on-surface-variant">Instant 30-second mobile registration</div>
+    </div>
+  </div>
+  <span class="material-symbols-outlined text-[20px] text-outline group-hover:text-secondary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+</div>
+
+<!-- Instant 1-Click Demo Login for Testing -->
+<div class="mt-5 p-3.5 rounded-xl bg-surface-container-low border border-outline-variant/60 flex items-center justify-between">
+  <div>
+    <span class="block text-xs font-bold text-primary">Instant Demo Citizen Access</span>
+    <span class="block text-[11px] text-on-surface-variant">Demo User: Rajeshwar Oraon (Ranchi)</span>
+  </div>
+  <button type="button" onclick="quickInstantCitizenLogin()" id="btn-instant-demo-login" class="px-3.5 py-2 bg-secondary hover:bg-secondary/90 text-on-secondary font-bold text-xs rounded-lg shadow-xs flex items-center gap-1.5 transition active:scale-[0.99]">
+    <span class="material-symbols-outlined text-[16px]">bolt</span>
+    <span>1-Click Sign In</span>
+  </button>
+</div>
+
+<div class="mt-4 pt-3 border-t border-outline-variant flex items-center justify-between text-xs text-outline">
+  <span>Secure Session • Protected by SSL</span>
+  <button class="text-primary font-bold hover:underline" onclick="closeLoginRequiredModal()" type="button">Cancel</button>
+</div>
+</div>
+</dialog>
+
 <!-- Success Modal for Submitted Problem (ID: JC2C-2026-00125) -->
 <dialog class="fixed inset-0 m-auto bg-transparent backdrop:bg-primary/70 backdrop:backdrop-blur-sm p-4 z-[80] max-w-lg w-full" id="success-submit-modal">
 <div class="bg-surface-container-lowest border-2 border-secondary rounded-2xl p-6 md:p-8 shadow-2xl text-center">
@@ -1531,6 +1858,112 @@ $user = $_SESSION['c2c_user'] ?? null;
 </footer>
 <!-- Vanilla JavaScript for Tab Switching, Interactive Chatbot, and Modal Workflows -->
 <script>
+    // Global Authentication Session State passed from PHP
+    window.C2C_USER = <?= json_encode($user) ?>;
+
+    // Login Required Modal Handlers
+    function openLoginRequiredModal() {
+      const modal = document.getElementById('login-required-modal');
+      if (modal) {
+        if (typeof modal.showModal === 'function') {
+          modal.showModal();
+        } else {
+          modal.classList.remove('hidden');
+        }
+      }
+    }
+
+    function closeLoginRequiredModal() {
+      const modal = document.getElementById('login-required-modal');
+      if (modal) {
+        if (typeof modal.close === 'function') {
+          modal.close();
+        } else {
+          modal.classList.add('hidden');
+        }
+      }
+    }
+
+    function handleReportInitiate() {
+      if (!window.C2C_USER) {
+        openLoginRequiredModal();
+      } else {
+        switchMainTab('report-view');
+      }
+    }
+
+    function handleCategoryClick(catName) {
+      if (!window.C2C_USER) {
+        sessionStorage.setItem('pending_category', catName);
+        openLoginRequiredModal();
+      } else {
+        selectCategoryAndReport(catName);
+      }
+    }
+
+    async function quickInstantCitizenLogin() {
+      const btn = document.getElementById('btn-instant-demo-login');
+      const origText = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span class="material-symbols-outlined text-[15px] animate-spin">refresh</span> Logging in...`;
+      }
+
+      try {
+        const res = await fetch('api/auth.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'login',
+            role: 'user',
+            mobile: '9876543210',
+            password: 'citizen123',
+            redirect: 'report'
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          window.C2C_USER = data.user;
+          const pendingCat = sessionStorage.getItem('pending_category');
+          if (pendingCat) {
+            window.location.href = "index.php?tab=report&category=" + encodeURIComponent(pendingCat);
+          } else {
+            window.location.href = "index.php?tab=report";
+          }
+        } else {
+          alert("Instant login failed: " + (data.message || 'Please use standard login.'));
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = origText;
+          }
+        }
+      } catch (err) {
+        console.error("Instant demo login error:", err);
+        window.location.href = "login.php?role=user&redirect=report";
+      }
+    }
+
+    function quickHeroSearch(term) {
+      const input = document.getElementById('hero-search');
+      if (input) input.value = term;
+      searchHeroQuery();
+    }
+
+    function searchHeroQuery() {
+      const q = (document.getElementById('hero-search') ? document.getElementById('hero-search').value : '').trim();
+      if (!q) return;
+      switchMainTab('track-view');
+      const trackInput = document.getElementById('track-id');
+      if (trackInput) {
+        trackInput.value = q;
+        fetchTrackComplaint(q);
+      }
+    }
+
+    function triggerVoiceSearch() {
+      alert("Voice search activated: Speak your village, ward, or grievance tracking token...");
+    }
+
     // Tab switching between primary flows
     function switchMainTab(targetTabId) {
       const tabs = ['home-view', 'report-view', 'track-view', 'how-view', 'dashboards-view', 'about-view'];
@@ -1805,6 +2238,12 @@ $user = $_SESSION['c2c_user'] ?? null;
     async function handleProblemSubmit(event) {
       event.preventDefault();
 
+      // Enforce login requirement on submission
+      if (!window.C2C_USER) {
+        openLoginRequiredModal();
+        return;
+      }
+
       const btn = document.getElementById('submit-problem-btn');
       const label = document.getElementById('submit-btn-label');
       const originalLabel = label.textContent;
@@ -1820,6 +2259,14 @@ $user = $_SESSION['c2c_user'] ?? null;
           method: 'POST',
           body: formData
         });
+
+        if (response.status === 401) {
+          openLoginRequiredModal();
+          btn.disabled = false;
+          label.textContent = originalLabel;
+          return;
+        }
+
         const result = await response.json();
 
         if (result.success) {
@@ -1832,6 +2279,10 @@ $user = $_SESSION['c2c_user'] ?? null;
           if (modal) modal.showModal();
 
           // Reset button
+          btn.disabled = false;
+          label.textContent = originalLabel;
+        } else if (result.require_login) {
+          openLoginRequiredModal();
           btn.disabled = false;
           label.textContent = originalLabel;
         } else {
@@ -2030,5 +2481,29 @@ $user = $_SESSION['c2c_user'] ?? null;
         btnHi.className = "px-2.5 py-0.5 rounded text-xs font-bold text-primary hover:bg-surface-container";
       }
     }
+
+    // Handle URL parameters for tab routing and pending categories on page load
+    document.addEventListener('DOMContentLoaded', function () {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      if (tab === 'report' || window.location.hash === '#report-section' || window.location.hash === '#report-view') {
+        switchMainTab('report-view');
+        const cat = params.get('category') || sessionStorage.getItem('pending_category');
+        if (cat) {
+          const select = document.getElementById('prob-category');
+          if (select) {
+            for (let i = 0; i < select.options.length; i++) {
+              if (select.options[i].text.toLowerCase().includes(cat.toLowerCase())) {
+                select.selectedIndex = i;
+                break;
+              }
+            }
+          }
+          sessionStorage.removeItem('pending_category');
+        }
+      } else if (tab === 'track' || window.location.hash === '#track-section') {
+        switchMainTab('track-view');
+      }
+    });
   </script>
 </body></html>

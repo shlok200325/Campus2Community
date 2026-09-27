@@ -116,11 +116,19 @@ if ($action === 'login') {
             'district' => $user['district'],
         ];
 
+        $targetRedirect = 'index.php';
+        $reqRedirect = trim($_POST['redirect'] ?? $_GET['redirect'] ?? '');
+        if ($reqRedirect === 'report') {
+            $targetRedirect = 'index.php?tab=report';
+        } elseif (!empty($reqRedirect) && (strpos($reqRedirect, 'index.php') === 0 || strpos($reqRedirect, 'admin_dashboard.php') === 0)) {
+            $targetRedirect = $reqRedirect;
+        }
+
         echo json_encode([
             'success' => true,
             'message' => "Welcome back, {$user['name']}!",
             'user' => $_SESSION['c2c_user'],
-            'redirect' => 'index.php'
+            'redirect' => $targetRedirect
         ]);
         exit;
     }

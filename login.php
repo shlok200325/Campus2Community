@@ -11,7 +11,8 @@ if (isset($_SESSION['c2c_user'])) {
         header('Location: admin_dashboard.php');
         exit;
     } else {
-        header('Location: index.php');
+        $dest = ($_GET['redirect'] ?? '') === 'report' ? 'index.php?tab=report' : 'index.php';
+        header("Location: {$dest}");
         exit;
     }
 }
@@ -737,10 +738,12 @@ $initialMode = $_GET['mode'] ?? 'login';
       submitBtn.disabled = true;
       submitBtn.innerHTML = `<span class="material-symbols-outlined text-[20px] animate-spin">refresh</span> Processing with Database...`;
 
+      const urlParams = new URLSearchParams(window.location.search);
       const payload = {
         action: currentMode,
         role: currentRole,
-        password: password
+        password: password,
+        redirect: urlParams.get('redirect') || ''
       };
 
       if (currentRole === 'user') {

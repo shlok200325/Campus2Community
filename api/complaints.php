@@ -31,12 +31,28 @@ if (!empty($raw)) {
 // 1. Submit New Grievance with Live GPS & Geotag
 // -------------------------------------------------------------
 if ($action === 'submit') {
+    // Enforce authentication: Complaints can only be registered after logging in
+    if (empty($_SESSION['c2c_user'])) {
+        http_response_code(401);
+        echo json_encode([
+            'success' => false,
+            'require_login' => true,
+            'message' => 'Authentication required: You must be logged in to register a complaint. Please log in with your mobile number or citizen account.'
+        ]);
+        exit;
+    }
+
+    $currentUser = $_SESSION['c2c_user'];
+
     $title = trim($_POST['problem_title'] ?? $_POST['title'] ?? '');
     $category = trim($_POST['category'] ?? 'General');
-    $district = trim($_POST['district'] ?? 'Ranchi');
+    $district = trim($_POST['district'] ?? ($currentUser['district'] ?? 'Ranchi'));
     $locality = trim($_POST['locality'] ?? 'Chutia, Ranchi');
-    $mobile = preg_replace('/[^0-9]/', '', $_POST['mobile'] ?? '');
-    $citizenName = trim($_POST['citizen_name'] ?? '');
+    
+    // Bind citizen credentials from authenticated session
+    $citizenName = !empty($currentUser['name']) ? $currentUser['name'] : trim($_POST['citizen_name'] ?? 'Verified Resident');
+    $mobile = !empty($currentUser['mobile']) ? $currentUser['mobile'] : preg_replace('/[^0-9]/', '', $_POST['mobile'] ?? '');
+    
     $description = trim($_POST['description'] ?? '');
     $urgency = trim($_POST['urgency'] ?? 'High');
 
@@ -58,14 +74,10 @@ if ($action === 'submit') {
         echo json_encode(['success' => false, 'message' => 'Detailed problem description is required.']);
         exit;
     }
-
-    // Default citizen info if not provided
-    if (isset($_SESSION['c2c_user']) && $_SESSION['c2c_user']['role'] === 'user') {
-        if (empty($citizenName)) $citizenName = $_SESSION['c2c_user']['name'];
-        if (empty($mobile)) $mobile = $_SESSION['c2c_user']['mobile'];
+    if (empty($mobile) || strlen($mobile) !== 10) {
+        echo json_encode(['success' => false, 'message' => 'A valid 10-digit mobile number linked to your account is required.']);
+        exit;
     }
-    if (empty($citizenName)) $citizenName = 'Civic Resident';
-    if (empty($mobile)) $mobile = '9876543210';
 
     // Handle photo upload if present
     $photoUrl = 'https://images.unsplash.com/photo-1541888946425-d0fbb186c5f7?auto=format&fit=crop&w=800&q=80';

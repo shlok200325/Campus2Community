@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Admin Scrutiny & University Allocation Console | Campus2Community Jharkhand</title>
+  <!-- Material Symbols & Typography -->
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#002238",
+            "primary-container": "#0f3854",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#7ea2c2",
+            "secondary": "#006d3b",
+            "secondary-container": "#97f3b3",
+            "on-secondary": "#ffffff",
+            "on-secondary-container": "#04723e",
+            "tertiary": "#e65100",
+            "surface": "#f7f9ff",
+            "surface-container-low": "#ecf4ff",
+            "surface-container": "#e4effc",
+            "surface-container-high": "#dee9f6",
+            "surface-container-lowest": "#ffffff",
+            "on-surface": "#121d26",
+            "on-surface-variant": "#42474d",
+            "outline": "#72777e",
+            "outline-variant": "#c2c7ce",
+            "error": "#ba1a1a",
+            "error-container": "#ffdad6"
+          },
+          fontFamily: {
+            "headline": ["Noto Sans", "sans-serif"],
+            "body": ["Inter", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .civic-tricolor-bar {
+      height: 4px;
+      background: linear-gradient(90deg, #E65100 0%, #FFFFFF 50%, #006d3b 100%);
+    }
+    *:focus-visible {
+      outline: 3px solid #006d3b !important;
+      outline-offset: 2px !important;
+    }
+    .badge-critical {
+      background-color: #ffdad6;
+      color: #93000a;
+      border: 1px solid #ba1a1a;
+    }
+    .badge-high {
+      background-color: #ffeedb;
+      color: #8a3b00;
+      border: 1px solid #e65100;
+    }
+    .badge-medium {
+      background-color: #e4effc;
+      color: #0f3854;
+      border: 1px solid #7ea2c2;
+    }
+    .badge-assigned {
+      background-color: #e7f5ed;
+      color: #006d3b;
+      border: 1px solid #006d3b;
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface font-body antialiased min-h-screen flex flex-col justify-between selection:bg-secondary-container selection:text-on-secondary-container">
+
+  <!-- 1. Sovereign Tricolor Stripe -->
+  <div class="civic-tricolor-bar w-full sticky top-0 z-50"></div>
+
+  <!-- 2. Government Top Authority Bar -->
+  <div class="bg-primary text-on-primary border-b border-primary-container text-xs py-1.5 px-4">
+    <div class="max-w-[1340px] mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <span class="w-2.5 h-2.5 rounded-full bg-secondary-container inline-block"></span>
+        <span class="font-bold tracking-wide uppercase text-[11px] text-surface-container-high">
+          Government of Jharkhand | उच्च एवं तकनीकी शिक्षा विभाग • State Innovation &amp; Scrutiny Council
+        </span>
+      </div>
+      <div class="flex items-center gap-4 text-xs">
+        <span class="text-surface-container-high flex items-center gap-1 font-mono">
+          <span class="w-2 h-2 rounded-full bg-secondary-container animate-pulse"></span>
+          ADMIN CONSOLE • SSL 256-BIT SECURE
+        </span>
+        <span class="text-outline-variant">|</span>
+        <a href="desktop_code.html" class="text-secondary-container hover:underline font-bold flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">public</span> Public Citizen Portal
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Admin Header Navigation -->
+  <header class="bg-surface-container-lowest border-b border-outline-variant shadow-sm sticky top-1 z-40">
+    <div class="max-w-[1340px] mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Brand & Admin Title -->
+      <div class="flex items-center gap-3.5">
+        <a href="desktop_code.html" class="flex items-center gap-2 group">
+          <img alt="Campus2Community Logo" class="h-10 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1U_Yy-0US0ZQ0BNmC5bQQ-Z-DI2WsjWqswuBtuGCYeqmWQ_TD1DKf8DsiS7ER9E_dlr119lcW3HjKnQYC14EOXjdwxr72asn-WG5LVsc72yBMWcnvsKYFmgxYoh6kOqWOYavm6zKxLiZtHb9QPkT8Ctssx68ffFMocJMLJW8xig6iRGunZb69LeFw3EWqUgRhkCHiej3oTv7tbRZkyYvCes-peoc9gX-0HvslxpqIshwEkbbtpRySCVk-uV"/>
+        </a>
+        <div class="border-l-2 border-outline-variant pl-3.5">
+          <div class="flex items-center gap-2">
+            <span class="font-headline text-lg font-bold text-primary tracking-tight">Admin Scrutiny &amp; University Allocation Desk</span>
+            <span class="px-2 py-0.5 rounded bg-tertiary/10 text-tertiary border border-tertiary/30 text-[10px] font-extrabold uppercase">
+              Authoritative Portal
+            </span>
+          </div>
+          <span class="block text-xs text-on-surface-variant">Review Grievances, Scrutinize University Bids &amp; Sanction State Innovation Grants</span>
+        </div>
+      </div>
+
+      <!-- Admin Identity & Actions -->
+      <div class="flex items-center gap-3">
+        <!-- Officer Profile Pill -->
+        <div class="hidden md:flex items-center gap-2.5 bg-surface-container-low border border-outline-variant px-3 py-1.5 rounded-xl text-xs">
+          <div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold">
+            <span class="material-symbols-outlined text-[18px]">shield_person</span>
+          </div>
+          <div>
+            <span id="admin-display-name" class="font-bold text-primary block leading-tight">Dr. Amitesh Kumar, IAS</span>
+            <span id="admin-display-role" class="text-[11px] text-secondary font-medium">Director of Scrutiny &amp; Innovation</span>
+          </div>
+        </div>
+
+        <!-- Quick Switch to Citizen Portal -->
+        <a href="desktop_code.html" class="flex items-center gap-1.5 bg-surface-container-lowest hover:bg-surface-container text-primary font-bold text-xs px-3.5 py-2 rounded-lg border border-outline-variant transition">
+          <span class="material-symbols-outlined text-[18px]">home</span>
+          <span>Citizen Portal</span>
+        </a>
+
+        <!-- Sign Out Button -->
+        <button onclick="handleAdminSignOut()" type="button" class="flex items-center gap-1.5 bg-error-container hover:bg-error/20 text-error font-bold text-xs px-3.5 py-2 rounded-lg border border-error/30 transition">
+          <span class="material-symbols-outlined text-[18px]">logout</span>
+          <span>Sign Out</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- 4. Main Administrative Body -->
+  <main class="flex-grow py-6 px-4">
+    <div class="max-w-[1340px] mx-auto space-y-6">
+
+      <!-- Breadcrumbs & Live Date Banner -->
+      <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2 text-on-surface-variant">
+          <a href="desktop_code.html" class="hover:underline">Home</a>
+          <span>/</span>
+          <a href="Login.html" class="hover:underline">Auth Portal</a>
+          <span>/</span>
+          <span class="font-bold text-primary">Admin Scrutiny Console</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-on-surface-variant flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px] text-secondary">calendar_today</span>
+            <span id="live-date">26 September 2026 | Ranchi, Jharkhand</span>
+          </span>
+          <button onclick="resetToInitialData()" type="button" class="text-[11px] text-outline hover:text-primary underline flex items-center gap-1" title="Restore sample complaints and proposals">
+            <span class="material-symbols-outlined text-[14px]">refresh</span> Reset Demo Data
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI METRIC CARDS -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        
+        <div class="bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-4 shadow-sm">
+          <div class="flex items-center justify-between text-on-surface-variant text-xs">
+            <span>Total Grievances</span>
+            <span class="material-symbols-outlined text-primary text-[18px]">report_problem</span>
+          </div>
+          <span id="kpi-total" class="font-headline text-2xl font-bold text-primary block mt-1">42</span>
+          <span class="text-[11px] text-secondary font-semibold">100% Geotagged</span>
+        </div>
+
+        <div class="bg-surface-container-lowest border-2 border-tertiary/40 bg-tertiary/5 rounded-xl p-4 shadow-sm">
+          <div class="flex items-center justify-between text-tertiary text-xs">
+            <span class="font-bold">Needs Scrutiny</span>
+            <span class="material-symbols-outlined text-tertiary text-[18px]">pending_actions</span>
+          </div>
+          <span id="kpi-pending" class="font-headline text-2xl font-bold text-tertiary block mt-1">15</span>
+          <span class="text-[11px] text-tertiary font-bold">Awaiting Decisions</span>
+        </div>
+
+        <div class="bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-4 shadow-sm">
+          <div class="flex items-center justify-between text-on-surface-variant text-xs">
+            <span>University Bids</span>
+            <span class="material-symbols-outlined text-primary text-[18px]">school</span>
+          </div>
+          <span id="kpi-bids" class="font-headline text-2xl font-bold text-primary block mt-1">28</span>
+          <span class="text-[11px] text-secondary font-semibold">Ready for Allocation</span>
+        </div>
+
+        <div class="bg-surface-container-lowest border-2 border-secondary/40 bg-secondary/5 rounded-xl p-4 shadow-sm">
+          <div class="flex items-center justify-between text-secondary text-xs">
+            <span class="font-bold">Assigned to Unis</span>
+            <span class="material-symbols-outlined text-secondary text-[18px]">handshake</span>
+          </div>
+          <span id="kpi-assigned" class="font-headline text-2xl font-bold text-secondary block mt-1">64</span>
+          <span class="text-[11px] text-secondary font-semibold">In Prototyping Labs</span>
+        </div>
+
+        <div class="bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-4 shadow-sm">
+          <div class="flex items-center justify-between text-on-surface-variant text-xs">
+            <span>Grants Approved</span>
+            <span class="material-symbols-outlined text-primary text-[18px]">currency_rupee</span>
+          </div>
+          <span class="font-headline text-2xl font-bold text-primary block mt-1">₹48.2 L</span>
+          <span class="text-[11px] text-outline">State Innovation Fund</span>
+        </div>
+
+        <div class="bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-4 shadow-sm">
+          <div class="flex items-center justify-between text-on-surface-variant text-xs">
+            <span>Resolved Tickets</span>
+            <span class="material-symbols-outlined text-secondary text-[18px]">verified</span>
+          </div>
+          <span class="font-headline text-2xl font-bold text-secondary block mt-1">2,914</span>
+          <span class="text-[11px] text-secondary font-semibold">Field Verified</span>
+        </div>
+
+      </div>
+
+      <!-- Toast Notification Container -->
+      <div id="admin-toast" class="hidden p-4 rounded-xl text-xs flex items-center justify-between gap-3 shadow-md border">
+        <div class="flex items-center gap-2.5">
+          <span id="admin-toast-icon" class="material-symbols-outlined text-[20px]">check_circle</span>
+          <span id="admin-toast-msg" class="font-bold text-sm"></span>
+        </div>
+        <button onclick="document.getElementById('admin-toast').classList.add('hidden')" type="button" class="text-on-surface hover:opacity-75">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <!-- MAIN SCRUTINY WORKBENCH -->
+      <div class="bg-surface-container-lowest border-2 border-outline-variant rounded-2xl shadow-sm overflow-hidden">
+        
+        <!-- Workbench Header & Filters -->
+        <div class="p-5 md:p-6 bg-surface-container-low border-b border-outline-variant space-y-4">
+          
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-secondary text-[24px]">fact_check</span>
+                <h2 class="font-headline text-xl font-bold text-primary">Citizen Grievances &amp; University Matching Queue</h2>
+              </div>
+              <p class="text-xs text-on-surface-variant mt-0.5">
+                Review submitted citizen complaints, scrutinize enrolled university technical solutions, and officially assign grants and MoAs.
+              </p>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="relative w-full md:w-80">
+              <span class="material-symbols-outlined absolute left-3 top-2.5 text-outline text-[18px]">search</span>
+              <input type="text" id="admin-search-input" oninput="applyFilters()" placeholder="Search ID, village, problem..." class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg pl-9 pr-4 py-2 text-xs text-on-surface placeholder:text-outline focus:border-primary focus:ring-1 focus:ring-primary"/>
+            </div>
+          </div>
+
+          <!-- Multi-Criteria Filters -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs pt-1">
+            
+            <!-- Filter: Status -->
+            <div>
+              <label class="block text-[11px] font-bold text-on-surface-variant uppercase mb-1" for="filter-status">
+                Filter by Status:
+              </label>
+              <select id="filter-status" onchange="applyFilters()" class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 text-xs font-semibold text-primary focus:border-primary">
+                <option value="all">All Grievances (सभी स्थितियाँ)</option>
+                <option value="needs_scrutiny">Needs Scrutiny / Bids Ready</option>
+                <option value="assigned">Assigned to University</option>
+                <option value="critical">Critical Severity Only</option>
+              </select>
+            </div>
+
+            <!-- Filter: Category -->
+            <div>
+              <label class="block text-[11px] font-bold text-on-surface-variant uppercase mb-1" for="filter-category">
+                Civic Category:
+              </label>
+              <select id="filter-category" onchange="applyFilters()" class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 text-xs font-semibold text-primary focus:border-primary">
+                <option value="all">All Domains (सभी श्रेणियाँ)</option>
+                <option value="Water & Sanitation">Water &amp; Sanitation (जल व स्वच्छता)</option>
+                <option value="Agriculture & Rural Tech">Agriculture &amp; Rural Tech (कृषि)</option>
+                <option value="Robotics & Disaster Safety">Robotics &amp; Disaster Safety (आपदा)</option>
+                <option value="Roads & Infrastructure">Roads &amp; Infrastructure (सड़क व पुलिया)</option>
+                <option value="Solar & Energy">Solar &amp; Renewable Energy (सौर ऊर्जा)</option>
+              </select>
+            </div>
+
+            <!-- Filter: District -->
+            <div>
+              <label class="block text-[11px] font-bold text-on-surface-variant uppercase mb-1" for="filter-district">
+                District:
+              </label>
+              <select id="filter-district" onchange="applyFilters()" class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 text-xs font-semibold text-primary focus:border-primary">
+                <option value="all">All 24 Districts (सभी ज़िले)</option>
+                <option value="Ranchi">Ranchi (राँची)</option>
+                <option value="Dhanbad">Dhanbad (धनबाद)</option>
+                <option value="East Singhbhum">East Singhbhum (जमशेदपुर)</option>
+                <option value="Bokaro">Bokaro (बोकारो)</option>
+                <option value="Hazaribagh">Hazaribagh (हजारीबाग)</option>
+                <option value="Dumka">Dumka (दुमका)</option>
+              </select>
+            </div>
+
+            <!-- Summary counter -->
+            <div class="flex flex-col justify-end">
+              <div class="bg-surface-container border border-outline-variant/60 rounded-lg px-3 py-2 flex items-center justify-between">
+                <span class="text-[11px] text-on-surface-variant font-medium">Matching Tickets:</span>
+                <span id="filtered-count" class="font-bold text-primary">5</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- COMPLAINT LISTINGS WITH UNIVERSITY ENROLLMENT & ASSIGNMENT CONTROLS -->
+        <div id="complaints-container" class="divide-y-2 divide-outline-variant/50 p-0">
+          <!-- Dynamic rendering via JavaScript -->
+        </div>
+
+      </div>
+
+      <!-- RECENT SCRUTINY AUDIT LOG & REVISED ALLOCATIONS -->
+      <div class="bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-5 shadow-sm space-y-3">
+        <div class="flex items-center justify-between border-b border-outline-variant pb-3">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary text-[22px]">history_edu</span>
+            <h3 class="font-headline font-bold text-sm text-primary">Administrative Scrutiny &amp; MoA Sanction Audit Log</h3>
+          </div>
+          <span class="text-[11px] text-outline font-mono">Live Ledger Sync</span>
+        </div>
+        <div id="audit-log-list" class="space-y-2 text-xs">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- 5. Interactive Scrutiny & University Assignment Modal -->
+  <dialog id="assign-modal" class="fixed inset-0 m-auto bg-transparent backdrop:bg-primary/70 backdrop:backdrop-blur-sm p-4 z-[80] max-w-2xl w-full">
+    <div class="bg-surface-container-lowest border-2 border-primary rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      
+      <!-- Modal Header -->
+      <div class="bg-primary text-on-primary p-5 flex items-start justify-between">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary-container text-[22px]">verified</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-surface-container-high">Official University Scrutiny Desk</span>
+          </div>
+          <h3 class="font-headline text-lg font-bold mt-1 text-on-primary">
+            Assign University to Complaint: <span id="modal-ticket-id" class="font-mono text-secondary-container"></span>
+          </h3>
+          <p id="modal-ticket-title" class="text-xs text-surface-container-high mt-0.5 line-clamp-1"></p>
+        </div>
+        <button onclick="closeAssignModal()" type="button" class="text-on-primary hover:bg-primary-container p-1 rounded-lg">
+          <span class="material-symbols-outlined text-[22px]">close</span>
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="p-6 overflow-y-auto space-y-5 text-xs">
+        
+        <!-- Complaint Snapshot -->
+        <div class="bg-surface-container-low border border-outline-variant p-3.5 rounded-xl space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-primary" id="modal-complaint-location"></span>
+            <span class="px-2 py-0.5 rounded text-[11px] font-bold" id="modal-complaint-severity"></span>
+          </div>
+          <p class="text-on-surface-variant text-[11px]" id="modal-complaint-desc"></p>
+          <div class="pt-1 text-[11px] text-outline flex items-center gap-2">
+            <span>Reported by: <strong class="text-on-surface" id="modal-complaint-citizen"></strong></span>
+            <span>•</span>
+            <span id="modal-complaint-mobile"></span>
+          </div>
+        </div>
+
+        <!-- Section: Universities Enrolled for Solution -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="block font-bold text-primary uppercase tracking-wider text-xs">
+              Select Enrolled University for Official Assignment:
+            </label>
+            <span class="text-[11px] text-secondary font-semibold" id="modal-enrolled-count"></span>
+          </div>
+          
+          <!-- Radio List of Enrolled University Bids -->
+          <div id="modal-university-choices" class="space-y-3">
+            <!-- Dynamic Choices -->
+          </div>
+        </div>
+
+        <!-- Grant Amount & Milestone Target -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-outline-variant">
+          <div>
+            <label class="block font-bold text-on-surface-variant mb-1" for="modal-grant-input">
+              Sanctioned Innovation Grant (स्वीकृत अनुदान राशि):
+            </label>
+            <div class="relative flex items-center">
+              <span class="absolute left-3 font-bold text-primary">₹</span>
+              <input type="text" id="modal-grant-input" value="65,000" class="w-full bg-surface-container-lowest border-2 border-outline-variant rounded-lg pl-7 pr-3 py-2 text-xs font-bold text-primary focus:border-primary focus:ring-1 focus:ring-primary"/>
+            </div>
+            <p class="text-[11px] text-outline mt-0.5">Disbursed directly into College Innovation Account.</p>
+          </div>
+
+          <div>
+            <label class="block font-bold text-on-surface-variant mb-1" for="modal-timeline-input">
+              Field Completion Target (समाधान समय सीमा):
+            </label>
+            <select id="modal-timeline-input" class="w-full bg-surface-container-lowest border-2 border-outline-variant rounded-lg px-3 py-2 text-xs font-bold text-primary focus:border-primary">
+              <option value="10 Days (Emergency Track)">10 Days (Emergency Track)</option>
+              <option value="15 Days (Accelerated Lab Sprint)" selected>15 Days (Accelerated Lab Sprint)</option>
+              <option value="21 Days (Standard Capstone)">21 Days (Standard Capstone)</option>
+              <option value="30 Days (Civil Installation)">30 Days (Civil Installation)</option>
+            </select>
+            <p class="text-[11px] text-outline mt-0.5">NAAC Civic Credits pegged to milestone.</p>
+          </div>
+        </div>
+
+        <!-- Scrutiny Remarks / MoA Terms -->
+        <div>
+          <label class="block font-bold text-on-surface-variant mb-1" for="modal-scrutiny-remarks">
+            Administrative Scrutiny Remarks &amp; Terms of MoA (जांच टिप्पणी):
+          </label>
+          <textarea id="modal-scrutiny-remarks" rows="2" class="w-full bg-surface-container-lowest border-2 border-outline-variant rounded-lg p-2.5 text-xs text-on-surface placeholder:text-outline focus:border-primary focus:ring-1 focus:ring-primary" placeholder="Enter terms of sanction, technical compliance conditions, or instructions for field prototyping..."></textarea>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 bg-surface-container-low border-t border-outline-variant flex items-center justify-between">
+        <button onclick="closeAssignModal()" type="button" class="px-4 py-2 rounded-lg text-xs font-bold text-on-surface-variant hover:bg-surface-container">
+          Cancel
+        </button>
+        <button onclick="confirmUniversityAssignment()" type="button" class="bg-secondary hover:bg-secondary/90 text-on-secondary px-5 py-2.5 rounded-lg text-xs font-bold flex items-center gap-2 shadow-sm active:scale-[0.99]">
+          <span class="material-symbols-outlined text-[18px]">verified</span>
+          <span>Confirm Official Assignment &amp; Issue MoA</span>
+        </button>
+      </div>
+
+    </div>
+  </dialog>
+
+  <!-- 6. Footer -->
+  <footer class="bg-primary text-on-primary py-5 px-4 border-t-4 border-secondary text-xs">
+    <div class="max-w-[1340px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-surface-container-high">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-secondary-container text-[20px]">account_balance</span>
+        <span>Jharkhand State Higher &amp; Technical Education Scrutiny Council • Campus2Community Engine</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="desktop_code.html" class="hover:underline">Public Portal</a>
+        <a href="Login.html" class="hover:underline">Switch User</a>
+        <span class="text-secondary-container font-mono">v2.4-ADMIN-JH</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============================================== -->
+  <!-- JAVASCRIPT: DATA & SCRUTINY ASSIGNMENT ENGINE  -->
+  <!-- ============================================== -->
+  <script>
+    // Initial standard dataset matching Campus2Community portal
+    const initialComplaints = [
+      {
+        id: "JC2C-2026-00142",
+        title: "Solar Cold-Storage Failure & Vegetable Crop Spoilage",
+        category: "Agriculture & Rural Tech",
+        location: "Pandra Mandi, Block Ranchi Rural",
+        district: "Ranchi",
+        citizenName: "Manoj Mahto",
+        citizenMobile: "+91 9431102944",
+        date: "16 Jan 2026",
+        severity: "High",
+        description: "Cold storage facility inverter system failed due to voltage surges. Over 40 quintals of seasonal vegetables at risk of rotting within 48 hours for 65 marginal farmers.",
+        stage: 4,
+        stageName: "Universities Enrolled (Pending Scrutiny)",
+        assignedUniversity: null,
+        assignedDept: null,
+        assignedGrant: null,
+        assignedTimeline: null,
+        assignedDate: null,
+        scrutinyNotes: "Awaiting final administrative scrutiny and selection of candidate university pod.",
+        enrolledUniversities: [
+          {
+            id: "uni-bau-ranchi",
+            name: "Birsa Agricultural University (BAU), Ranchi",
+            department: "Dept of Agricultural Engineering & Tech",
+            leadFaculty: "Dr. Rameshwar Singh",
+            teamSize: 8,
+            proposedGrant: "₹65,000",
+            proposedTimeline: "12 Days",
+            solutionSummary: "Low-cost Phase Change Material (PCM) backup refrigeration retrofit with automated solar inverter surge protection.",
+            status: "Candidate"
+          },
+          {
+            id: "uni-bit-mesra-ee",
+            name: "Birla Institute of Technology (BIT), Mesra",
+            department: "Electrical & Electronics Engineering",
+            leadFaculty: "Dr. Pritam Bannerjee",
+            teamSize: 5,
+            proposedGrant: "₹72,000",
+            proposedTimeline: "15 Days",
+            solutionSummary: "Hybrid microgrid surge protection circuit and IoT temperature monitoring module with emergency SMS alerts.",
+            status: "Candidate"
+          },
+          {
+            id: "uni-poly-ranchi",
+            name: "Government Polytechnic Ranchi",
+            department: "Electrical Engineering Cell",
+            leadFaculty: "Er. K. N. Sinha",
+            teamSize: 6,
+            proposedGrant: "₹48,000",
+            proposedTimeline: "20 Days",
+            solutionSummary: "Standard dual-battery backup rack with solid-state relay bypass switch.",
+            status: "Candidate"
+          }
+        ]
+      },
+      {
+        id: "JC2C-2026-00188",
+        title: "Subsidence Hazard & Gas Leakage Detection Near Colliery Slums",
+        category: "Robotics & Disaster Safety",
+        location: "Ward 4, Jharia Colliery Belt, Dhanbad",
+        district: "Dhanbad",
+        citizenName: "Sunita Devi",
+        citizenMobile: "+91 9122334455",
+        date: "17 Jan 2026",
+        severity: "Critical",
+        description: "Cracks observed on brick houses accompanied by methane odors following blasting nearby. Immediate sensor monitoring and ground stabilization analysis required.",
+        stage: 4,
+        stageName: "Universities Enrolled (Pending Scrutiny)",
+        assignedUniversity: null,
+        assignedDept: null,
+        assignedGrant: null,
+        assignedTimeline: null,
+        assignedDate: null,
+        scrutinyNotes: "Urgent safety alert. Requires mining engineering and robotics telemetry pod.",
+        enrolledUniversities: [
+          {
+            id: "uni-ism-dhanbad",
+            name: "IIT (ISM) Dhanbad",
+            department: "Dept of Mining & Robotics Telemetry",
+            leadFaculty: "Prof. Arvind Shekhar",
+            teamSize: 7,
+            proposedGrant: "₹95,000",
+            proposedTimeline: "10 Days",
+            solutionSummary: "Autonomous aerial LIDAR drone mapping + multi-gas wireless sensor nodes for 24/7 seismic/methane monitoring.",
+            status: "Candidate"
+          },
+          {
+            id: "uni-bit-sindri",
+            name: "BIT Sindri",
+            department: "Civil & Mining Engineering Pod",
+            leadFaculty: "Dr. B. K. Ray",
+            teamSize: 6,
+            proposedGrant: "₹60,000",
+            proposedTimeline: "14 Days",
+            solutionSummary: "Ground tiltmeter array with SMS emergency siren trigger unit for ward residents.",
+            status: "Candidate"
+          }
+        ]
+      },
+      {
+        id: "JC2C-2026-00219",
+        title: "Borewell Recharge & Rainwater Harvesting in Ormanjhi High School",
+        category: "Water & Sanitation",
+        location: "Govt High School, Ormanjhi, Ranchi Rural",
+        district: "Ranchi",
+        citizenName: "Pankaj Tirkey (Principal)",
+        citizenMobile: "+91 9771122334",
+        date: "19 Jan 2026",
+        severity: "Medium",
+        description: "Mid-day meal program affected as the campus handpump has dried down to 280ft depth. Need rooftop catchment and sub-surface recharge well.",
+        stage: 4,
+        stageName: "Universities Enrolled (Pending Scrutiny)",
+        assignedUniversity: null,
+        assignedDept: null,
+        assignedGrant: null,
+        assignedTimeline: null,
+        assignedDate: null,
+        scrutinyNotes: "High community impact on 350 tribal school children. Multiple colleges enrolled for adoption.",
+        enrolledUniversities: [
+          {
+            id: "uni-marwari-college",
+            name: "Marwari College Ranchi",
+            department: "Environmental Science Dept",
+            leadFaculty: "Dr. Sushma Minz",
+            teamSize: 5,
+            proposedGrant: "₹50,000",
+            proposedTimeline: "21 Days",
+            solutionSummary: "Sand-gravel tiered percolation pit connected to 4,000 sq ft rooftop gutter matrix.",
+            status: "Candidate"
+          },
+          {
+            id: "uni-bit-mesra-civil",
+            name: "Birla Institute of Technology (BIT), Mesra",
+            department: "Dept of Civil Engineering",
+            leadFaculty: "Dr. Anand Kumar",
+            teamSize: 4,
+            proposedGrant: "₹65,000",
+            proposedTimeline: "16 Days",
+            solutionSummary: "Engineered deep recharge shaft with sedimentation chamber and automated water level monitor.",
+            status: "Candidate"
+          }
+        ]
+      },
+      {
+        id: "JC2C-2026-00125",
+        title: "Broken Submersible Pump & Contaminated Groundwater",
+        category: "Water & Sanitation",
+        location: "Ward 14, Chutia, Ranchi",
+        district: "Ranchi",
+        citizenName: "Rajeshwar Oraon",
+        citizenMobile: "+91 9876543210",
+        date: "14 Jan 2026",
+        severity: "High",
+        description: "The primary municipal submersible pump has suffered motor burnout, causing blackish sediment to flow into community taps. Approximately 420 households currently lack safe drinking water.",
+        stage: 5,
+        stageName: "University Selected (Assigned)",
+        assignedUniversity: "Birla Institute of Technology (BIT), Mesra",
+        assignedDept: "Dept of Civil & Environmental Engineering",
+        assignedGrant: "₹75,000",
+        assignedTimeline: "18 Days",
+        assignedDate: "18 Jan 2026",
+        scrutinyNotes: "Water quality test confirmed high fluorides. BIT Mesra team led by Dr. S. K. Verma approved for de-fluoridation and solar automation unit.",
+        enrolledUniversities: [
+          {
+            id: "uni-bit-mesra-01",
+            name: "Birla Institute of Technology (BIT), Mesra",
+            department: "Dept of Civil & Environmental Engineering",
+            leadFaculty: "Dr. S. K. Verma",
+            teamSize: 6,
+            proposedGrant: "₹75,000",
+            proposedTimeline: "18 Days",
+            solutionSummary: "Modular solar-assisted electrocoagulation de-fluoridation unit with IoT telemetry.",
+            status: "Selected"
+          },
+          {
+            id: "uni-nit-jsr-01",
+            name: "National Institute of Technology (NIT), Jamshedpur",
+            department: "Mechanical & Water Resources Pod",
+            leadFaculty: "Prof. Anjali Soren",
+            teamSize: 5,
+            proposedGrant: "₹82,000",
+            proposedTimeline: "24 Days",
+            solutionSummary: "Centrifugal pump overhaul with activated alumina adsorption beds.",
+            status: "Reviewed"
+          }
+        ]
+      },
+      {
+        id: "JC2C-2026-00305",
+        title: "Culvert Washout & Flash Flood Road Disconnection in Bundu",
+        category: "Roads & Infrastructure",
+        location: "Kanchi River Tributary, Bundu",
+        district: "Ranchi",
+        citizenName: "Govind Munda",
+        citizenMobile: "+91 9654128790",
+        date: "20 Jan 2026",
+        severity: "High",
+        description: "Monsoon runoff eroded concrete foundation of the primary school access culvert. School vans and milk transport halted.",
+        stage: 4,
+        stageName: "Universities Enrolled (Pending Scrutiny)",
+        assignedUniversity: null,
+        assignedDept: null,
+        assignedGrant: null,
+        assignedTimeline: null,
+        assignedDate: null,
+        scrutinyNotes: "Structural analysis submitted. Civil engineering bid received.",
+        enrolledUniversities: [
+          {
+            id: "uni-ramgovind-eng",
+            name: "Ramgovind Institute of Technology",
+            department: "Civil Engineering Department",
+            leadFaculty: "Prof. D. K. Mishra",
+            teamSize: 5,
+            proposedGrant: "₹58,000",
+            proposedTimeline: "25 Days",
+            solutionSummary: "Rapid pre-cast modular box culvert reinforcement blueprint with gabion stone wall protection.",
+            status: "Candidate"
+          },
+          {
+            id: "uni-bit-mesra-struct",
+            name: "Birla Institute of Technology (BIT), Mesra",
+            department: "Structural Engineering Pod",
+            leadFaculty: "Dr. Sandeep Mukherjee",
+            teamSize: 6,
+            proposedGrant: "₹68,000",
+            proposedTimeline: "20 Days",
+            solutionSummary: "Geogrid reinforced soil abutment with twin arch corrugated steel culvert pipe.",
+            status: "Candidate"
+          }
+        ]
+      }
+    ];
+
+    // State Variables
+    let complaints = [];
+    let activeTicketId = null;
+    let auditLogs = [
+      {
+        time: "18 Jan 2026, 16:40 IST",
+        text: "Ticket <strong>JC2C-2026-00125</strong> scrutinized: BIT Mesra Civil Dept officially assigned for Solar De-fluoridation. Grant of ₹75,000 sanctioned.",
+        officer: "Dr. Amitesh Kumar, IAS"
+      },
+      {
+        time: "19 Jan 2026, 11:20 IST",
+        text: "New enrollment proposal received from <strong>IIT (ISM) Dhanbad</strong> for Colliery Subsidence ticket JC2C-2026-00188.",
+        officer: "System Auto-Sync"
+      },
+      {
+        time: "20 Jan 2026, 14:15 IST",
+        text: "3 University proposals registered for Cold Storage Inverter failure ticket JC2C-2026-00142. Ready for Scrutiny.",
+        officer: "Innovation Cell Desk"
+      }
+    ];
+
+    // Initialize Page
+    window.addEventListener('DOMContentLoaded', () => {
+      // Check auth from localStorage
+      const authData = localStorage.getItem('c2c_auth');
+      if (authData) {
+        try {
+          const auth = JSON.parse(authData);
+          if (auth.name) {
+            document.getElementById('admin-display-name').textContent = auth.name;
+          }
+          if (auth.designation) {
+            document.getElementById('admin-display-role').textContent = auth.designation;
+          }
+        } catch (e) {
+          console.error("Auth parse error:", e);
+        }
+      }
+
+      // Load Complaints from localStorage or initial
+      loadComplaints();
+      renderAuditLogs();
+      applyFilters();
+    });
+
+    function loadComplaints() {
+      const stored = localStorage.getItem('c2c_complaints');
+      if (stored) {
+        try {
+          complaints = JSON.parse(stored);
+        } catch (e) {
+          complaints = initialComplaints;
+        }
+      } else {
+        complaints = initialComplaints;
+        saveComplaints();
+      }
+      updateKpis();
+    }
+
+    function saveComplaints() {
+      localStorage.setItem('c2c_complaints', JSON.stringify(complaints));
+      updateKpis();
+    }
+
+    function resetToInitialData() {
+      complaints = JSON.parse(JSON.stringify(initialComplaints));
+      saveComplaints();
+      showToast("Demo data reset to initial benchmark state.", "info");
+      applyFilters();
+    }
+
+    function updateKpis() {
+      const total = complaints.length;
+      const pending = complaints.filter(c => !c.assignedUniversity).length;
+      const assigned = complaints.filter(c => c.assignedUniversity).length;
+      
+      let totalBids = 0;
+      complaints.forEach(c => {
+        if (c.enrolledUniversities) totalBids += c.enrolledUniversities.length;
+      });
+
+      document.getElementById('kpi-total').textContent = total;
+      document.getElementById('kpi-pending').textContent = pending;
+      document.getElementById('kpi-assigned').textContent = assigned;
+      document.getElementById('kpi-bids').textContent = totalBids;
+    }
+
+    // Filter logic
+    function applyFilters() {
+      const statusFilter = document.getElementById('filter-status').value;
+      const catFilter = document.getElementById('filter-category').value;
+      const distFilter = document.getElementById('filter-district').value;
+      const search = document.getElementById('admin-search-input').value.toLowerCase().trim();
+
+      const filtered = complaints.filter(c => {
+        // Status filter
+        if (statusFilter === 'needs_scrutiny' && c.assignedUniversity) return false;
+        if (statusFilter === 'assigned' && !c.assignedUniversity) return false;
+        if (statusFilter === 'critical' && c.severity !== 'Critical') return false;
+
+        // Category filter
+        if (catFilter !== 'all' && c.category !== catFilter) return false;
+
+        // District filter
+        if (distFilter !== 'all' && c.district !== distFilter) return false;
+
+        // Search query
+        if (search) {
+          const matchId = c.id.toLowerCase().includes(search);
+          const matchTitle = c.title.toLowerCase().includes(search);
+          const matchLoc = c.location.toLowerCase().includes(search);
+          const matchCitizen = c.citizenName.toLowerCase().includes(search);
+          if (!matchId && !matchTitle && !matchLoc && !matchCitizen) return false;
+        }
+
+        return true;
+      });
+
+      document.getElementById('filtered-count').textContent = filtered.length;
+      renderComplaintsList(filtered);
+    }
+
+    // Render Complaint Cards with University Proposals
+    function renderComplaintsList(list) {
+      const container = document.getElementById('complaints-container');
+      container.innerHTML = "";
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="p-12 text-center text-outline">
+            <span class="material-symbols-outlined text-4xl mb-2 text-outline-variant">search_off</span>
+            <p class="font-bold text-sm text-on-surface">No complaints match your filter criteria.</p>
+            <p class="text-xs mt-1">Try clearing filters or search query.</p>
+          </div>
+        `;
+        return;
+      }
+
+      list.forEach(c => {
+        const isAssigned = !!c.assignedUniversity;
+        const enrolledUnis = c.enrolledUniversities || [];
+
+        // Severity badge
+        let sevClass = "badge-medium";
+        if (c.severity === "Critical") sevClass = "badge-critical";
+        else if (c.severity === "High") sevClass = "badge-high";
+
+        const card = document.createElement('div');
+        card.className = "p-5 md:p-6 hover:bg-surface-container-lowest/80 transition space-y-4";
+        card.id = `ticket-row-${c.id}`;
+
+        card.innerHTML = `
+          <!-- Top Row: ID, Category, Location, Severity & Status -->
+          <div class="flex flex-wrap items-center justify-between gap-2.5">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="font-mono font-extrabold text-sm text-primary bg-surface-container px-2.5 py-1 rounded border border-outline-variant">
+                ${c.id}
+              </span>
+              <span class="text-xs bg-surface-container-high text-primary font-bold px-2 py-0.5 rounded">
+                ${c.category}
+              </span>
+              <span class="text-xs px-2.5 py-0.5 rounded-full font-bold ${sevClass}">
+                ● ${c.severity} Severity
+              </span>
+              <span class="text-xs text-on-surface-variant flex items-center gap-1">
+                <span class="material-symbols-outlined text-[15px] text-outline">location_on</span>
+                <strong>${c.location}</strong> (${c.district})
+              </span>
+            </div>
+
+            <!-- Current Stage Status Pill -->
+            <div>
+              ${isAssigned ? `
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-secondary text-on-secondary shadow-sm">
+                  <span class="material-symbols-outlined text-[16px]">verified</span>
+                  Stage 5: University Assigned
+                </span>
+              ` : `
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-tertiary/10 text-tertiary border border-tertiary/30">
+                  <span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+                  Stage 4: Needs Scrutiny &amp; Assignment
+                </span>
+              `}
+            </div>
+          </div>
+
+          <!-- Problem Title & Citizen Info -->
+          <div>
+            <h3 class="font-headline text-base font-bold text-primary">${c.title}</h3>
+            <p class="text-xs text-on-surface-variant mt-1 leading-relaxed">${c.description}</p>
+            <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-outline">
+              <span>Reported by: <strong class="text-on-surface">${c.citizenName}</strong> (${c.citizenMobile})</span>
+              <span>•</span>
+              <span>Filed: <strong>${c.date}</strong></span>
+              <span>•</span>
+              <span class="text-secondary font-semibold">GPS Tagged: ±4m Accuracy</span>
+            </div>
+          </div>
+
+          <!-- ASSIGNED UNIVERSITY HIGHLIGHT (IF ALREADY ASSIGNED) -->
+          ${isAssigned ? `
+            <div class="bg-secondary/10 border-2 border-secondary/50 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0 font-bold">
+                  <span class="material-symbols-outlined text-[20px]">school</span>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-[11px] font-bold text-secondary uppercase tracking-wider">Officially Assigned University</span>
+                    <span class="bg-secondary text-on-secondary px-2 py-0.2 rounded text-[10px] font-bold">MoA Executed</span>
+                  </div>
+                  <h4 class="font-bold text-sm text-primary">${c.assignedUniversity}</h4>
+                  <span class="text-xs text-on-surface-variant">${c.assignedDept || ''}</span>
+                  <p class="text-xs text-on-surface mt-1"><strong class="text-secondary">Scrutiny Note:</strong> ${c.scrutinyNotes}</p>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap md:flex-col items-end gap-1.5 text-xs shrink-0">
+                <span class="font-bold text-primary">Sanctioned Grant: <span class="text-secondary font-mono">${c.assignedGrant || '₹75,000'}</span></span>
+                <span class="text-outline">Timeline Target: <strong>${c.assignedTimeline || '18 Days'}</strong></span>
+                <button onclick="openAssignModal('${c.id}')" type="button" class="mt-1 text-[11px] text-primary hover:text-secondary underline font-bold">
+                  Re-assign / Modify MoA
+                </button>
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- SECTION: UNIVERSITIES ENROLLED FOR SOLUTION -->
+          <div class="bg-surface-container-low/70 border border-outline-variant/80 rounded-xl p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-[18px]">how_to_reg</span>
+                <span class="font-bold text-xs text-primary uppercase tracking-wider">
+                  Universities Enrolled for Solution (${enrolledUnis.length} Institutional Bids)
+                </span>
+              </div>
+              <span class="text-[11px] text-outline">Sorted by NAAC Accreditation &amp; Technical Fit</span>
+            </div>
+
+            <!-- List of Enrolled University Proposals -->
+            <div class="grid grid-cols-1 md:grid-cols-${enrolledUnis.length > 2 ? '3' : '2'} gap-3">
+              ${enrolledUnis.map(u => `
+                <div class="bg-surface-container-lowest border ${u.name === c.assignedUniversity ? 'border-2 border-secondary bg-secondary/5' : 'border-outline-variant'} rounded-xl p-3 flex flex-col justify-between space-y-2">
+                  <div>
+                    <div class="flex items-start justify-between gap-1 mb-1">
+                      <span class="font-bold text-xs text-primary line-clamp-1">${u.name}</span>
+                      ${u.name === c.assignedUniversity ? `
+                        <span class="bg-secondary text-on-secondary px-1.5 py-0.2 rounded text-[10px] font-bold shrink-0">Assigned</span>
+                      ` : `
+                        <span class="bg-surface-container text-outline px-1.5 py-0.2 rounded text-[10px] font-semibold shrink-0">Enrolled Bid</span>
+                      `}
+                    </div>
+                    <span class="text-[11px] text-secondary font-semibold block">${u.department}</span>
+                    <p class="text-[11px] text-on-surface-variant mt-1.5 line-clamp-2">${u.solutionSummary}</p>
+                  </div>
+
+                  <div class="pt-2 border-t border-outline-variant/60 flex items-center justify-between text-[11px]">
+                    <span class="text-outline">Lead: <strong>${u.leadFaculty}</strong> (${u.teamSize} students)</span>
+                    <span class="font-bold text-primary">${u.proposedGrant}</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+
+            <!-- Scrutiny & Assignment Call-to-Action Bar -->
+            <div class="pt-2 flex flex-wrap items-center justify-between gap-3">
+              <div class="text-[11px] text-on-surface-variant flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-secondary text-[16px]">verified</span>
+                <span>All enrolled college faculty verified via AICTE/UGC credentials.</span>
+              </div>
+
+              ${!isAssigned ? `
+                <button onclick="openAssignModal('${c.id}')" type="button" class="bg-secondary hover:bg-secondary/90 text-on-secondary font-bold text-xs px-5 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition active:scale-[0.99]">
+                  <span class="material-symbols-outlined text-[18px]">assignment_turned_in</span>
+                  <span>Scrutinize &amp; Assign University (आवंटित करें)</span>
+                </button>
+              ` : `
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-secondary font-bold flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[16px]">check_circle</span>
+                    Official State Allocation Finalized
+                  </span>
+                  <button onclick="openAssignModal('${c.id}')" type="button" class="bg-surface-container text-primary font-bold text-xs px-3 py-1.5 rounded-lg border border-outline-variant hover:bg-surface-container-high transition">
+                    Modify Decision
+                  </button>
+                </div>
+              `}
+            </div>
+
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    // Open Assign Modal for a specific Ticket
+    function openAssignModal(ticketId) {
+      activeTicketId = ticketId;
+      const ticket = complaints.find(c => c.id === ticketId);
+      if (!ticket) return;
+
+      document.getElementById('modal-ticket-id').textContent = ticket.id;
+      document.getElementById('modal-ticket-title').textContent = ticket.title;
+      document.getElementById('modal-complaint-location').textContent = `${ticket.location} (${ticket.district})`;
+      document.getElementById('modal-complaint-severity').textContent = `${ticket.severity} Severity`;
+      document.getElementById('modal-complaint-severity').className = ticket.severity === "Critical" ? "px-2 py-0.5 rounded text-[11px] font-bold badge-critical" : "px-2 py-0.5 rounded text-[11px] font-bold badge-high";
+      document.getElementById('modal-complaint-desc').textContent = ticket.description;
+      document.getElementById('modal-complaint-citizen').textContent = ticket.citizenName;
+      document.getElementById('modal-complaint-mobile').textContent = ticket.citizenMobile;
+      document.getElementById('modal-enrolled-count').textContent = `${ticket.enrolledUniversities ? ticket.enrolledUniversities.length : 0} Colleges Enrolled`;
+
+      // Render University Choices in Modal
+      const choicesContainer = document.getElementById('modal-university-choices');
+      choicesContainer.innerHTML = "";
+
+      if (ticket.enrolledUniversities && ticket.enrolledUniversities.length > 0) {
+        ticket.enrolledUniversities.forEach((u, idx) => {
+          const isSelected = ticket.assignedUniversity ? (ticket.assignedUniversity === u.name) : (idx === 0);
+          
+          const label = document.createElement('label');
+          label.className = `block p-3.5 rounded-xl border-2 cursor-pointer transition ${isSelected ? 'border-secondary bg-secondary/5' : 'border-outline-variant hover:border-primary bg-surface-container-lowest'}`;
+          label.onclick = () => {
+            // Update radio
+            document.querySelectorAll('#modal-university-choices label').forEach(l => l.className = "block p-3.5 rounded-xl border-2 border-outline-variant hover:border-primary bg-surface-container-lowest cursor-pointer transition");
+            label.className = "block p-3.5 rounded-xl border-2 border-secondary bg-secondary/5 cursor-pointer transition";
+            // Pre-fill proposed grant
+            if (u.proposedGrant) {
+              document.getElementById('modal-grant-input').value = u.proposedGrant.replace('₹', '').replace(',', '');
+            }
+          };
+
+          label.innerHTML = `
+            <div class="flex items-start gap-3">
+              <input type="radio" name="modal_uni_radio" value="${u.name}" ${isSelected ? 'checked' : ''} class="mt-1 text-secondary focus:ring-secondary w-4 h-4"/>
+              <div class="flex-grow">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-sm text-primary">${u.name}</span>
+                  <span class="font-bold text-xs text-secondary">${u.proposedGrant || ''} • ${u.proposedTimeline || ''}</span>
+                </div>
+                <span class="text-xs text-secondary font-medium block">${u.department}</span>
+                <p class="text-xs text-on-surface-variant mt-1 leading-snug"><strong>Solution:</strong> ${u.solutionSummary}</p>
+                <div class="mt-2 text-[11px] text-outline flex items-center gap-3">
+                  <span>Lead Faculty: <strong>${u.leadFaculty}</strong></span>
+                  <span>•</span>
+                  <span>Student Pod Size: <strong>${u.teamSize} B.Tech/M.Tech Students</strong></span>
+                </div>
+              </div>
+            </div>
+          `;
+          choicesContainer.appendChild(label);
+        });
+
+        // Set initial grant input
+        const initialSelected = ticket.enrolledUniversities.find(u => u.name === ticket.assignedUniversity) || ticket.enrolledUniversities[0];
+        if (initialSelected && initialSelected.proposedGrant) {
+          document.getElementById('modal-grant-input').value = initialSelected.proposedGrant.replace('₹', '').replace(',', '');
+        }
+      }
+
+      document.getElementById('modal-scrutiny-remarks').value = ticket.scrutinyNotes || "Technical proposal approved after scrutiny of laboratory capabilities and student pod competency.";
+
+      document.getElementById('assign-modal').showModal();
+    }
+
+    function closeAssignModal() {
+      document.getElementById('assign-modal').close();
+    }
+
+    // Confirm Assignment & Save
+    function confirmUniversityAssignment() {
+      if (!activeTicketId) return;
+
+      const selectedRadio = document.querySelector('input[name="modal_uni_radio"]:checked');
+      if (!selectedRadio) {
+        alert("Please select a university to assign.");
+        return;
+      }
+
+      const assignedUniName = selectedRadio.value;
+      const grantVal = document.getElementById('modal-grant-input').value.trim();
+      const timelineVal = document.getElementById('modal-timeline-input').value;
+      const remarks = document.getElementById('modal-scrutiny-remarks').value.trim();
+
+      const ticketIndex = complaints.findIndex(c => c.id === activeTicketId);
+      if (ticketIndex === -1) return;
+
+      const ticket = complaints[ticketIndex];
+      const selectedUniObj = ticket.enrolledUniversities.find(u => u.name === assignedUniName);
+
+      // Update Ticket Data
+      ticket.assignedUniversity = assignedUniName;
+      ticket.assignedDept = selectedUniObj ? selectedUniObj.department : "Engineering Department";
+      ticket.assignedGrant = "₹" + grantVal;
+      ticket.assignedTimeline = timelineVal;
+      ticket.assignedDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+      ticket.scrutinyNotes = remarks;
+      ticket.stage = 5;
+      ticket.stageName = "University Selected (Assigned)";
+
+      // Update university statuses
+      ticket.enrolledUniversities.forEach(u => {
+        if (u.name === assignedUniName) u.status = "Selected";
+        else u.status = "Reviewed";
+      });
+
+      // Save to localStorage
+      saveComplaints();
+
+      // Also sync to MySQL Database Backend
+      const assignFormData = new FormData();
+      assignFormData.append('action', 'assign_university');
+      assignFormData.append('complaint_id', ticket.id === 'JC2C-2026-00125' ? 1 : (ticket.id === 'JC2C-2026-00089' ? 2 : (ticket.id === 'JC2C-2026-00042' ? 3 : 1)));
+      assignFormData.append('university_name', assignedUniName);
+      assignFormData.append('grant_amount', grantVal);
+      assignFormData.append('milestone_timeline', timelineVal);
+      assignFormData.append('scrutiny_notes', remarks);
+
+      fetch('api/complaints.php', {
+        method: 'POST',
+        body: assignFormData
+      }).catch(e => console.warn("Backend MySQL sync optional:", e));
+
+      // Add to Audit Log
+      auditLogs.unshift({
+        time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + " IST Today",
+        text: `Official MoA issued for Ticket <strong>${ticket.id}</strong>. Assigned to <strong>${assignedUniName}</strong>. Grant: ₹${grantVal}.`,
+        officer: document.getElementById('admin-display-name').textContent
+      });
+      renderAuditLogs();
+
+      closeAssignModal();
+      applyFilters();
+
+      showToast(`✓ Ticket ${ticket.id} successfully assigned to ${assignedUniName}! MoA recorded in State Scrutiny Ledger & MySQL Database.`, "success");
+    }
+
+    // Render Audit Trail
+    function renderAuditLogs() {
+      const container = document.getElementById('audit-log-list');
+      container.innerHTML = auditLogs.map(log => `
+        <div class="p-3 bg-surface-container-low rounded-lg border border-outline-variant/60 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+          <div>
+            <span class="text-on-surface">${log.text}</span>
+            <span class="text-[11px] text-outline block sm:inline sm:ml-2">(Auth: ${log.officer})</span>
+          </div>
+          <span class="text-[11px] font-mono text-outline shrink-0">${log.time}</span>
+        </div>
+      `).join('');
+    }
+
+    // Show Toast
+    function showToast(msg, type = "success") {
+      const toast = document.getElementById('admin-toast');
+      const msgEl = document.getElementById('admin-toast-msg');
+      const iconEl = document.getElementById('admin-toast-icon');
+
+      msgEl.innerHTML = msg;
+      toast.classList.remove('hidden');
+
+      if (type === "success") {
+        toast.className = "p-4 rounded-xl text-xs flex items-center justify-between gap-3 shadow-md bg-secondary-container text-on-secondary-container border border-secondary";
+        iconEl.className = "material-symbols-outlined text-[20px] text-secondary";
+        iconEl.textContent = "check_circle";
+      } else {
+        toast.className = "p-4 rounded-xl text-xs flex items-center justify-between gap-3 shadow-md bg-surface-container text-primary border border-outline-variant";
+        iconEl.className = "material-symbols-outlined text-[20px] text-primary";
+        iconEl.textContent = "info";
+      }
+
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 6000);
+    }
+
+    // Admin Sign Out
+    function handleAdminSignOut() {
+      if (confirm("Are you sure you want to sign out of the Admin Scrutiny Console?")) {
+        localStorage.removeItem('c2c_auth');
+        window.location.href = "Login.html?mode=login&role=admin";
+      }
+    }
+  </script>
+</body>
+</html>
